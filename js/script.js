@@ -98,6 +98,37 @@ const STRINGS = {
 const SUPPORTED_LANGS = ['en', 'ar'];
 const DEFAULT_LANG = 'en';
 const STORAGE_KEY = 'kgm-lang';
+
+/* Form messages (bilingual). Kept separate from UI-chrome STRINGS.
+   Arabic here is a working placeholder pending professional translation. */
+const FORM_MESSAGES = {
+  en: {
+    name: 'Please enter your name.',
+    phone: 'Please enter a valid phone number.',
+    emirate: 'Please select your emirate.',
+    model: 'Please select a model.',
+    consent: 'Please accept to continue.',
+    tooFast: 'That was a little quick — please try again.',
+    summary: (n) => `Please review ${n} field${n > 1 ? 's' : ''} above.`,
+    // Honest: validation passed, but no submission transport is connected yet.
+    notConfigured: 'Details look good. Submission is not yet connected (CONTENT REQUIRED: endpoint).'
+  },
+  ar: {
+    name: 'يرجى إدخال اسمك.',
+    phone: 'يرجى إدخال رقم هاتف صحيح.',
+    emirate: 'يرجى اختيار الإمارة.',
+    model: 'يرجى اختيار طراز.',
+    consent: 'يرجى الموافقة للمتابعة.',
+    tooFast: 'كان ذلك سريعًا بعض الشيء — يرجى المحاولة مرة أخرى.',
+    summary: (n) => `يرجى مراجعة ${n} حقل أعلاه.`,
+    notConfigured: 'البيانات تبدو صحيحة. لم يتم ربط الإرسال بعد (محتوى مطلوب: نقطة الإرسال).'
+  }
+};
+
+// Submission transport is NOT configured (technical-architecture §7).
+// No endpoint/provider is invented. When provided later, POST here and fire
+// `generate_lead` ONLY on server-confirmed success.
+const SUBMIT_ENDPOINT = null;
 // URL/language strategy is NOT YET CONFIRMED (technical-architecture §6):
 // foundation reads a saved preference only; no URL scheme is assumed.
 
@@ -135,6 +166,8 @@ const i18n = {
 
     // Direction-dependent components may need to re-evaluate their edges.
     if (window.__kgmModels) window.__kgmModels.refresh();
+    // Re-render any visible form messages in the new language.
+    if (window.__kgmForm) window.__kgmForm.refresh();
 
     if (!silent && from !== lang) {
       analytics.track('language_switch', { from_language: from, to_language: lang });
@@ -346,30 +379,192 @@ const reveal = {
 };
 
 /* ---------------------------------------------------------------------------
-   leadForm — foundation hooks only (NO submission backend)
+   leadForm — FILL → VALIDATE (client). NO submission backend is wired.
+   Fields (brief §9): Name, Phone, Emirate, Model of interest, PDPL consent.
    --------------------------------------------------------------------------- */
+
+// Pure validators — return true when the value is acceptable.
+const validators = {
+  name: (v) => v.trim().length >= 2,
+  // Lenient, UAE-aware: strip spacing/punctuation, allow optional +, 7–15 digits.
+  // NOTE: exact strictness is a decision to confirm (technical-architecture §7).
+  phone: (v) => /^\+?\d{7,15}$/.test(v.replace(/[\s\-().]/g, '')),
+  select: (v) => v !== '' && v != null,
+  consent: (checked) => checked === true
+};
+
 const leadForm = {
   init() {
     this.form = document.querySelector('[data-lead-form]');
     if (!this.form) return;
-    this.status = this.form.querySelector('[data-form-status]');
 
-    let started = false;
+    this.status = this.form.querySelector('[data-form-status]');
+    this.honeypot = this.form.querySelector('[name="company"]');
+    this.consent = this.form.querySelector('[name="consent"]');
+    this.startTime = Date.now();
+    this.state = 'idle';   // 'idle' | 'errors' | 'ok'
+    this.interacted = false;
+
+    // Field definitions: element + validator + message key.
+    this.fields = [
+      { name: 'name', el: this.form.querySelector('#lead-name'), test: (el) => validators.name(el.value) },
+      { name: 'phone', el: this.form.querySelector('#lead-phone'), test: (el) => validators.phone(el.value) },
+      { name: 'emirate', el: this.form.querySelector('#lead-emirate'), test: (el) => validators.select(el.value) },
+      { name: 'model', el: this.form.querySelector('#lead-model'), test: (el) => validators.select(el.value) }
+    ].filter((f) => f.el);
+
+    this.bindStart();
+    this.bindLiveValidation();
+    this.form.addEventListener('submit', (e) => this.onSubmit(e));
+
+    window.__kgmForm = this;
+  },
+
+  msg(key) { return FORM_MESSAGES[i18n.current][key]; },
+
+  bindStart() {
     this.form.addEventListener('input', () => {
-      if (started) return;
-      started = true;
+      if (this.interacted) return;
+      this.interacted = true;
       const model = this.form.querySelector('[name="model"]');
       analytics.track('form_start', { model_prefilled: Boolean(model && model.value) });
-    });
+    }, { passive: true });
+  },
 
-    this.form.addEventListener('submit', (e) => {
-      e.preventDefault(); // No endpoint configured — never fake a submission.
-      if (this.status) {
-        this.status.hidden = false;
-        this.status.classList.add('is-error');
-        this.status.textContent = 'Submission endpoint not yet configured (CONTENT REQUIRED).';
-      }
+  // After a first submit, validate on blur and clear errors as the user corrects.
+  bindLiveValidation() {
+    this.fields.forEach((f) => {
+      const revalidate = () => {
+        if (this.state === 'idle') return;
+        f.test(f.el) ? this.clearError(f.el) : this.setError(f.el, this.msg(f.name));
+      };
+      f.el.addEventListener('blur', revalidate);
+      f.el.addEventListener('input', revalidate);
+      f.el.addEventListener('change', revalidate);
     });
+    if (this.consent) {
+      this.consent.addEventListener('change', () => {
+        if (this.state === 'idle') return;
+        validators.consent(this.consent.checked)
+          ? this.clearError(this.consent)
+          : this.setError(this.consent, this.msg('consent'));
+      });
+    }
+  },
+
+  // Returns [{ name, input }] for every failing field, in DOM order.
+  validateAll() {
+    const errors = [];
+    this.fields.forEach((f) => { if (!f.test(f.el)) errors.push({ name: f.name, input: f.el }); });
+    if (this.consent && !validators.consent(this.consent.checked)) {
+      errors.push({ name: 'consent', input: this.consent });
+    }
+    return errors;
+  },
+
+  onSubmit(e) {
+    e.preventDefault();
+    analytics.track('form_submit');
+
+    // Spam: honeypot must stay empty (bots fill it) — drop silently.
+    if (this.honeypot && this.honeypot.value.trim() !== '') return;
+
+    // Spam: submissions faster than ~2s are treated as automated.
+    if (Date.now() - this.startTime < 2000) {
+      this.state = 'errors';
+      this.showStatus(this.msg('tooFast'), 'error');
+      return;
+    }
+
+    const errors = this.validateAll();
+    if (errors.length) {
+      this.state = 'errors';
+      errors.forEach((err) => this.setError(err.input, this.msg(err.name)));
+      // Clear any fields that are now valid.
+      this.allInputs().forEach((el) => {
+        if (!errors.some((er) => er.input === el)) this.clearError(el);
+      });
+      analytics.track('form_error', { error_fields: errors.map((er) => er.name) });
+      this.showStatus(this.msg('summary')(errors.length), 'error');
+      errors[0].input.focus({ preventScroll: false });
+      return;
+    }
+
+    this.clearAllErrors();
+    this.onValid();
+  },
+
+  onValid() {
+    // No transport configured — do NOT fake a submission or fire generate_lead.
+    if (!SUBMIT_ENDPOINT) {
+      this.state = 'ok';
+      this.showStatus(this.msg('notConfigured'), 'ok');
+      return;
+    }
+    // Later phase: POST to SUBMIT_ENDPOINT, then on server-confirmed success
+    // fire analytics.track('generate_lead', {...}) and show the success state.
+  },
+
+  /* --- error rendering + ARIA wiring --- */
+  allInputs() {
+    const list = this.fields.map((f) => f.el);
+    if (this.consent) list.push(this.consent);
+    return list;
+  },
+
+  errorEl(input) {
+    if (!input.id) input.id = 'consent-field';
+    const id = `${input.id}-error`;
+    let el = document.getElementById(id);
+    if (!el) {
+      el = document.createElement('p');
+      el.className = 'field__error';
+      el.id = id;
+      const field = input.closest('.field') || input.closest('.field--consent') || input.parentElement;
+      field.appendChild(el);
+    }
+    return el;
+  },
+
+  setError(input, message) {
+    const el = this.errorEl(input);
+    el.textContent = message;
+    input.setAttribute('aria-invalid', 'true');
+    input.setAttribute('aria-describedby', el.id);
+    (input.closest('.field') || input.closest('.field--consent'))?.classList.add('has-error');
+  },
+
+  clearError(input) {
+    const el = document.getElementById(`${input.id}-error`);
+    if (el) el.textContent = '';
+    input.removeAttribute('aria-invalid');
+    input.removeAttribute('aria-describedby');
+    (input.closest('.field') || input.closest('.field--consent'))?.classList.remove('has-error');
+  },
+
+  clearAllErrors() { this.allInputs().forEach((el) => this.clearError(el)); },
+
+  showStatus(text, type) {
+    if (!this.status) return;
+    this.status.hidden = false;
+    this.status.classList.toggle('is-error', type === 'error');
+    this.status.classList.toggle('is-ok', type === 'ok');
+    this.status.textContent = text;
+  },
+
+  // Re-render visible messages in the active language (called by i18n on switch).
+  refresh() {
+    if (this.state === 'idle') return;
+    if (this.state === 'ok') { this.showStatus(this.msg('notConfigured'), 'ok'); return; }
+    const errors = this.validateAll();
+    if (!errors.length) {
+      this.clearAllErrors();
+      this.state = 'idle';
+      if (this.status) this.status.hidden = true;
+      return;
+    }
+    errors.forEach((err) => this.setError(err.input, this.msg(err.name)));
+    this.showStatus(this.msg('summary')(errors.length), 'error');
   }
 };
 

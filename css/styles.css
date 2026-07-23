@@ -424,11 +424,16 @@ p { text-wrap: pretty; }
 .field--consent .consent { display: flex; gap: var(--s-3); align-items: start; font-size: var(--fs--1); color: var(--muted); }
 .field--consent input { margin-block-start: 0.2em; inline-size: 18px; block-size: 18px; accent-color: var(--accent); }
 
+/* Inline field errors (created by JS; empty until a message is set) */
+.field__error { font-size: var(--fs--1); color: var(--error); min-block-size: 0; }
+.field__error:empty { display: none; }
+.field.has-error .field__label { color: var(--error); }
+
 .hp-field { position: absolute; inset-inline-start: -9999px; inline-size: 1px; block-size: 1px; overflow: hidden; }
 
-.form-status { font-size: var(--fs--1); color: var(--muted); }
-.form-status.is-error { color: var(--error); }
-.form-status.is-ok { color: var(--accent-hi); }
+.form-status { font-size: var(--fs--1); color: var(--muted); padding: var(--s-3) var(--s-4); border: 1px solid var(--line); border-radius: var(--radius); }
+.form-status.is-error { color: var(--error); border-color: color-mix(in srgb, var(--error) 45%, transparent); }
+.form-status.is-ok { color: var(--accent-hi); border-color: color-mix(in srgb, var(--accent-hi) 45%, transparent); }
 
 /* ---------------------------------------------------------------------------
    13 · PERSISTENT ACTIONS (WhatsApp)
