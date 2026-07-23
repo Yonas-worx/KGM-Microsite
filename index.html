@@ -1,235 +1,259 @@
 <!DOCTYPE html>
 <!--
-  KGM UAE Microsite — Foundation
-  Single-page, bilingual (EN/AR), mobile-first.
+  KGM UAE Microsite
+  Premium, bilingual (EN/AR), mobile-first, single-page experience.
   Journey: ARRIVE → EXPLORE → TRUST → REGISTER
   Sources of truth: docs/project-brief.md, docs/visual-ux-direction.md, docs/technical-architecture.md
 
-  CONTENT INTEGRITY:
-  - Section titles + the hero message are drawn from approved project materials (proposal).
-  - All marketing copy, vehicle key numbers, imagery, showroom details, contact
-    details, WhatsApp number/message, and legal/PDPL wording are UNCONFIRMED and are
-    marked with data-content="required" and visible [CONTENT REQUIRED] tags.
-  - Arabic strings applied by JS are working placeholders for UI chrome only; ALL final
-    copy (EN + professional AR translation) is CONTENT REQUIRED. Nothing is invented.
+  CONTENT INTEGRITY
+  - Section titles and the hero message ("KGM is in the UAE") and the "August 2026"
+    arrival fact are drawn from approved project materials (proposal / brief §1, §3).
+  - The hero background is a designed VISUAL PLACEHOLDER (CSS composition). It is NOT a
+    vehicle photograph and is NOT presented as official KGM imagery. Approved imagery is
+    required — see the marked badge and data-content flags.
+  - Vehicle key numbers, model imagery, showroom details, contact details, WhatsApp
+    number/message, legal/PDPL wording, and final SEO copy are UNCONFIRMED and marked
+    with data-content="required". Nothing is invented.
+  - Arabic strings applied by JS are working placeholders for UI chrome only; all final
+    copy (EN + professional AR translation) is CONTENT REQUIRED (project-brief §13).
 -->
 <html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0b0d">
 
-  <!-- SEO: structure only — final copy/URLs are CONTENT REQUIRED (see technical-architecture.md §11) -->
+  <!-- SEO: structure only — final copy/URLs are CONTENT REQUIRED (technical-architecture §11) -->
   <title>KGM UAE — CONTENT REQUIRED: page title</title>
   <meta name="description" content="CONTENT REQUIRED: meta description">
-  <!-- hreflang / canonical / OG / favicon: added once URL strategy + assets are confirmed -->
+  <!-- hreflang / canonical / Open Graph / favicon added once URL strategy + assets confirmed -->
 
   <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
-  <!-- Skip link (accessibility) -->
   <a class="skip-link" href="#main" data-i18n="a11y.skip">Skip to content</a>
 
   <!-- ============================================================= -->
-  <!-- HEADER / PERSISTENT NAVIGATION LAYER                          -->
+  <!-- HEADER · persistent navigation layer                          -->
   <!-- ============================================================= -->
-  <header class="site-header" role="banner" data-header>
+  <header class="site-header" data-header>
     <div class="container site-header__inner">
-
-      <!-- Brand / logo — CONTENT REQUIRED: official KGM logo lockup -->
+      <!-- Brand — CONTENT REQUIRED: official KGM logo lockup -->
       <a class="brand" href="#hero" aria-label="KGM — home">
-        <span class="brand__mark" aria-hidden="true">KGM</span>
-        <span class="brand__note" data-content="required">[LOGO CONTENT REQUIRED]</span>
+        <span class="brand__mark">KGM</span>
+        <span class="brand__sub" data-i18n="brand.sub">United Arab Emirates</span>
       </a>
 
-      <!-- Primary navigation -->
       <nav class="site-nav" aria-label="Primary" data-nav>
+        <ul class="nav-list" id="nav-list" data-nav-list>
+          <li><a href="#models" data-nav-link data-i18n="nav.models">Models</a></li>
+          <li><a href="#gallery" data-nav-link data-i18n="nav.gallery">Gallery</a></li>
+          <li><a href="#showrooms" data-nav-link data-i18n="nav.showrooms">Showrooms</a></li>
+          <li><a href="#register" data-nav-link data-i18n="nav.register">Register</a></li>
+        </ul>
+      </nav>
+
+      <div class="site-header__actions">
+        <div class="lang-switch" role="group" aria-label="Language" data-lang-switch>
+          <button type="button" class="lang-switch__btn is-active" data-lang="en" aria-pressed="true">EN</button>
+          <span class="lang-switch__sep" aria-hidden="true"></span>
+          <button type="button" class="lang-switch__btn" data-lang="ar" aria-pressed="false">AR</button>
+        </div>
+
+        <a href="#register" class="btn btn--primary btn--sm cta-header"
+           data-cta="register" data-cta-location="header" data-i18n="cta.register">Register Interest</a>
+
         <button class="nav-toggle" type="button" aria-expanded="false"
                 aria-controls="nav-list" data-nav-toggle>
           <span class="nav-toggle__bars" aria-hidden="true"></span>
           <span class="visually-hidden" data-i18n="nav.menu">Menu</span>
         </button>
-
-        <ul class="nav-list" id="nav-list" data-nav-list>
-          <li><a href="#models" data-i18n="nav.models">Models</a></li>
-          <li><a href="#gallery" data-i18n="nav.gallery">Gallery</a></li>
-          <li><a href="#showrooms" data-i18n="nav.showrooms">Showrooms</a></li>
-          <li><a href="#register" data-i18n="nav.register">Register</a></li>
-        </ul>
-      </nav>
-
-      <div class="site-header__actions">
-        <!-- Language switcher (EN | AR) -->
-        <div class="lang-switch" role="group" aria-label="Language" data-lang-switch>
-          <button type="button" class="lang-switch__btn is-active"
-                  data-lang="en" aria-pressed="true">EN</button>
-          <span class="lang-switch__sep" aria-hidden="true">|</span>
-          <button type="button" class="lang-switch__btn"
-                  data-lang="ar" aria-pressed="false">AR</button>
-        </div>
-
-        <!-- Persistent Register Interest CTA -->
-        <a href="#register" class="btn btn--primary btn--sm"
-           data-cta="register" data-cta-location="header"
-           data-i18n="cta.register">Register Interest</a>
       </div>
-
     </div>
   </header>
 
   <main id="main">
 
     <!-- ============================================================= -->
-    <!-- 1. HERO  (ARRIVE)                                             -->
+    <!-- 1 · HERO  (ARRIVE)                                            -->
     <!-- ============================================================= -->
-    <section id="hero" class="section hero" data-reveal>
-      <!-- CONTENT REQUIRED: cinematic hero imagery/footage -->
-      <div class="hero__media" data-content="required" aria-hidden="true">
-        <span class="media-placeholder__tag">[HERO IMAGE — CONTENT REQUIRED]</span>
+    <section id="hero" class="hero">
+      <!-- Designed visual placeholder (CSS). NOT a vehicle photo, NOT official imagery. -->
+      <div class="hero__stage" aria-hidden="true">
+        <div class="hero__layer hero__layer--glow"></div>
+        <div class="hero__layer hero__layer--sweep"></div>
+        <div class="hero__layer hero__layer--grain"></div>
+        <div class="hero__layer hero__layer--vignette"></div>
       </div>
+
+      <span class="hero__badge" data-content="required">Visual placeholder — approved KGM hero imagery required</span>
 
       <div class="container hero__content">
-        <!-- Hero message from approved proposal ("KGM is in the UAE") -->
-        <h1 class="hero__title" data-i18n="hero.title">KGM is in the UAE</h1>
-        <p class="hero__sub" data-content="required" data-i18n="hero.sub">
-          [CONTENT REQUIRED: hero supporting line]
+        <p class="hero__kicker" data-reveal>
+          <span class="rule" aria-hidden="true"></span>
+          <span data-i18n="hero.kicker">United Arab Emirates</span>
         </p>
-        <a href="#register" class="btn btn--primary btn--lg"
-           data-cta="register" data-cta-location="hero"
-           data-i18n="cta.register">Register Interest</a>
+        <h1 class="hero__title" data-reveal data-i18n="hero.title">KGM is in the UAE</h1>
+        <!-- Support line is a fact from project materials (brief §1: August 2026 arrival) -->
+        <p class="hero__sub" data-reveal data-i18n="hero.sub">The first vehicles arrive in August 2026.</p>
 
-        <a href="#models" class="hero__scroll" data-i18n="hero.explore">
-          Explore the models
-        </a>
+        <div class="hero__actions" data-reveal>
+          <a href="#register" class="btn btn--primary btn--lg"
+             data-cta="register" data-cta-location="hero" data-i18n="cta.register">Register Interest</a>
+          <a href="#models" class="btn btn--ghost btn--lg" data-i18n="hero.explore">Explore the models</a>
+        </div>
       </div>
+
+      <a href="#models" class="hero__scroll" aria-label="Scroll to models">
+        <span class="hero__scroll-text" data-i18n="hero.scroll">Scroll</span>
+        <span class="hero__scroll-line" aria-hidden="true"></span>
+      </a>
     </section>
 
     <!-- ============================================================= -->
-    <!-- 2. THE MODELS  (EXPLORE)                                      -->
+    <!-- 2 · THE MODELS  (EXPLORE)                                     -->
     <!-- ============================================================= -->
-    <section id="models" class="section section--dark" data-reveal>
+    <section id="models" class="section section--dark models">
       <div class="container">
-        <header class="section-head">
+        <header class="section-head" data-reveal>
           <p class="section-head__eyebrow" data-i18n="models.eyebrow">The Models</p>
           <h2 class="section-head__title" data-i18n="models.title">The lineup</h2>
           <p class="section-head__note" data-content="required">
-            NOT SPECIFIED IN PROJECT MATERIALS: final confirmed UAE lineup &amp; launch
-            order. The cards below use the <em>potential</em> lineup as placeholders.
+            NOT SPECIFIED IN PROJECT MATERIALS: final confirmed UAE lineup &amp; launch order.
+            Cards below use the <em>potential</em> lineup as placeholders; "whichever models
+            arrive first lead the page" (brief §6).
           </p>
         </header>
+      </div>
 
-        <!-- Data-driven at a later stage; static placeholders for the foundation.
-             Each card: name (potential lineup) + image slot + THREE key-number slots.
-             CONTENT REQUIRED: official imagery + the three key numbers per model. -->
-        <ul class="models-grid" data-models>
-          <!-- Placeholder card template repeated for the potential lineup -->
-          <li class="model-card">
-            <div class="model-card__media" data-content="required" aria-hidden="true">
-              <span class="media-placeholder__tag">[MODEL IMAGE]</span>
+      <!-- Horizontal editorial showcase (scroll-snap; JS adds controls, RTL-aware) -->
+      <div class="models__viewport" data-models-viewport>
+        <ul class="models__track" data-models-track>
+          <!-- Card template. CONTENT REQUIRED: official imagery + three key numbers per model. -->
+          <li class="model-card" data-reveal>
+            <div class="model-card__media" data-content="required">
+              <span class="model-card__ph">[MODEL IMAGE]</span>
+              <span class="model-card__index">01</span>
             </div>
             <div class="model-card__body">
               <h3 class="model-card__name">Tivoli</h3>
-              <dl class="key-numbers" data-content="required">
-                <div class="key-number"><dt>[KEY NUMBER 1]</dt><dd>CONTENT REQUIRED</dd></div>
-                <div class="key-number"><dt>[KEY NUMBER 2]</dt><dd>CONTENT REQUIRED</dd></div>
-                <div class="key-number"><dt>[KEY NUMBER 3]</dt><dd>CONTENT REQUIRED</dd></div>
+              <dl class="key-numbers" data-content="required" aria-label="Key figures — content required">
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 1]</dt></div>
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 2]</dt></div>
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 3]</dt></div>
               </dl>
             </div>
           </li>
 
-          <li class="model-card">
-            <div class="model-card__media" data-content="required" aria-hidden="true">
-              <span class="media-placeholder__tag">[MODEL IMAGE]</span>
+          <li class="model-card" data-reveal>
+            <div class="model-card__media" data-content="required">
+              <span class="model-card__ph">[MODEL IMAGE]</span>
+              <span class="model-card__index">02</span>
             </div>
             <div class="model-card__body">
               <h3 class="model-card__name">Torres</h3>
-              <dl class="key-numbers" data-content="required">
-                <div class="key-number"><dt>[KEY NUMBER 1]</dt><dd>CONTENT REQUIRED</dd></div>
-                <div class="key-number"><dt>[KEY NUMBER 2]</dt><dd>CONTENT REQUIRED</dd></div>
-                <div class="key-number"><dt>[KEY NUMBER 3]</dt><dd>CONTENT REQUIRED</dd></div>
+              <dl class="key-numbers" data-content="required" aria-label="Key figures — content required">
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 1]</dt></div>
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 2]</dt></div>
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 3]</dt></div>
               </dl>
             </div>
           </li>
 
-          <li class="model-card">
-            <div class="model-card__media" data-content="required" aria-hidden="true">
-              <span class="media-placeholder__tag">[MODEL IMAGE]</span>
+          <li class="model-card" data-reveal>
+            <div class="model-card__media" data-content="required">
+              <span class="model-card__ph">[MODEL IMAGE]</span>
+              <span class="model-card__index">03</span>
             </div>
             <div class="model-card__body">
               <h3 class="model-card__name">Torres Hybrid</h3>
-              <dl class="key-numbers" data-content="required">
-                <div class="key-number"><dt>[KEY NUMBER 1]</dt><dd>CONTENT REQUIRED</dd></div>
-                <div class="key-number"><dt>[KEY NUMBER 2]</dt><dd>CONTENT REQUIRED</dd></div>
-                <div class="key-number"><dt>[KEY NUMBER 3]</dt><dd>CONTENT REQUIRED</dd></div>
+              <dl class="key-numbers" data-content="required" aria-label="Key figures — content required">
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 1]</dt></div>
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 2]</dt></div>
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 3]</dt></div>
               </dl>
             </div>
           </li>
 
-          <li class="model-card">
-            <div class="model-card__media" data-content="required" aria-hidden="true">
-              <span class="media-placeholder__tag">[MODEL IMAGE]</span>
+          <li class="model-card" data-reveal>
+            <div class="model-card__media" data-content="required">
+              <span class="model-card__ph">[MODEL IMAGE]</span>
+              <span class="model-card__index">04</span>
             </div>
             <div class="model-card__body">
               <h3 class="model-card__name">Actyon</h3>
-              <dl class="key-numbers" data-content="required">
-                <div class="key-number"><dt>[KEY NUMBER 1]</dt><dd>CONTENT REQUIRED</dd></div>
-                <div class="key-number"><dt>[KEY NUMBER 2]</dt><dd>CONTENT REQUIRED</dd></div>
-                <div class="key-number"><dt>[KEY NUMBER 3]</dt><dd>CONTENT REQUIRED</dd></div>
+              <dl class="key-numbers" data-content="required" aria-label="Key figures — content required">
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 1]</dt></div>
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 2]</dt></div>
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 3]</dt></div>
               </dl>
             </div>
           </li>
 
-          <li class="model-card">
-            <div class="model-card__media" data-content="required" aria-hidden="true">
-              <span class="media-placeholder__tag">[MODEL IMAGE]</span>
+          <li class="model-card" data-reveal>
+            <div class="model-card__media" data-content="required">
+              <span class="model-card__ph">[MODEL IMAGE]</span>
+              <span class="model-card__index">05</span>
             </div>
             <div class="model-card__body">
               <h3 class="model-card__name">Rexton</h3>
-              <dl class="key-numbers" data-content="required">
-                <div class="key-number"><dt>[KEY NUMBER 1]</dt><dd>CONTENT REQUIRED</dd></div>
-                <div class="key-number"><dt>[KEY NUMBER 2]</dt><dd>CONTENT REQUIRED</dd></div>
-                <div class="key-number"><dt>[KEY NUMBER 3]</dt><dd>CONTENT REQUIRED</dd></div>
+              <dl class="key-numbers" data-content="required" aria-label="Key figures — content required">
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 1]</dt></div>
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 2]</dt></div>
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 3]</dt></div>
               </dl>
             </div>
           </li>
 
-          <li class="model-card">
-            <div class="model-card__media" data-content="required" aria-hidden="true">
-              <span class="media-placeholder__tag">[MODEL IMAGE]</span>
+          <li class="model-card" data-reveal>
+            <div class="model-card__media" data-content="required">
+              <span class="model-card__ph">[MODEL IMAGE]</span>
+              <span class="model-card__index">06</span>
             </div>
             <div class="model-card__body">
               <h3 class="model-card__name">Musso</h3>
-              <dl class="key-numbers" data-content="required">
-                <div class="key-number"><dt>[KEY NUMBER 1]</dt><dd>CONTENT REQUIRED</dd></div>
-                <div class="key-number"><dt>[KEY NUMBER 2]</dt><dd>CONTENT REQUIRED</dd></div>
-                <div class="key-number"><dt>[KEY NUMBER 3]</dt><dd>CONTENT REQUIRED</dd></div>
+              <dl class="key-numbers" data-content="required" aria-label="Key figures — content required">
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 1]</dt></div>
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 2]</dt></div>
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 3]</dt></div>
               </dl>
             </div>
           </li>
 
-          <li class="model-card">
-            <div class="model-card__media" data-content="required" aria-hidden="true">
-              <span class="media-placeholder__tag">[MODEL IMAGE]</span>
+          <li class="model-card" data-reveal>
+            <div class="model-card__media" data-content="required">
+              <span class="model-card__ph">[MODEL IMAGE]</span>
+              <span class="model-card__index">07</span>
             </div>
             <div class="model-card__body">
               <h3 class="model-card__name">Musso EV</h3>
-              <dl class="key-numbers" data-content="required">
-                <div class="key-number"><dt>[KEY NUMBER 1]</dt><dd>CONTENT REQUIRED</dd></div>
-                <div class="key-number"><dt>[KEY NUMBER 2]</dt><dd>CONTENT REQUIRED</dd></div>
-                <div class="key-number"><dt>[KEY NUMBER 3]</dt><dd>CONTENT REQUIRED</dd></div>
+              <dl class="key-numbers" data-content="required" aria-label="Key figures — content required">
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 1]</dt></div>
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 2]</dt></div>
+                <div class="key-number"><dd>—</dd><dt>[KEY NUMBER 3]</dt></div>
               </dl>
             </div>
           </li>
         </ul>
       </div>
+
+      <div class="container models__controls" data-models-controls hidden>
+        <button class="slider-btn" type="button" data-models-prev aria-label="Previous model">
+          <span aria-hidden="true">‹</span>
+        </button>
+        <button class="slider-btn" type="button" data-models-next aria-label="Next model">
+          <span aria-hidden="true">›</span>
+        </button>
+      </div>
     </section>
 
     <!-- ============================================================= -->
-    <!-- 3. GALLERY  (TRUST)                                           -->
+    <!-- 3 · GALLERY  (TRUST)                                          -->
     <!-- ============================================================= -->
-    <section id="gallery" class="section" data-reveal>
+    <section id="gallery" class="section gallery">
       <div class="container">
-        <header class="section-head">
+        <header class="section-head" data-reveal>
           <p class="section-head__eyebrow" data-i18n="gallery.eyebrow">Gallery</p>
           <h2 class="section-head__title" data-i18n="gallery.title">A closer look</h2>
           <p class="section-head__note" data-content="required">
@@ -238,84 +262,80 @@
         </header>
       </div>
 
-      <!-- Full-bleed placeholder tiles -->
+      <!-- Editorial asymmetric mosaic; placeholders marked, no invented imagery -->
       <ul class="gallery-grid" data-gallery>
-        <li class="gallery-item" data-content="required" aria-hidden="true">
-          <span class="media-placeholder__tag">[GALLERY IMAGE 1]</span>
+        <li class="gallery-item gallery-item--wide" data-content="required" data-reveal>
+          <span class="gallery-item__ph">[GALLERY IMAGE 1]</span>
         </li>
-        <li class="gallery-item" data-content="required" aria-hidden="true">
-          <span class="media-placeholder__tag">[GALLERY IMAGE 2]</span>
+        <li class="gallery-item" data-content="required" data-reveal>
+          <span class="gallery-item__ph">[GALLERY IMAGE 2]</span>
         </li>
-        <li class="gallery-item" data-content="required" aria-hidden="true">
-          <span class="media-placeholder__tag">[GALLERY IMAGE 3]</span>
+        <li class="gallery-item" data-content="required" data-reveal>
+          <span class="gallery-item__ph">[GALLERY IMAGE 3]</span>
         </li>
-        <li class="gallery-item" data-content="required" aria-hidden="true">
-          <span class="media-placeholder__tag">[GALLERY IMAGE 4]</span>
+        <li class="gallery-item gallery-item--tall" data-content="required" data-reveal>
+          <span class="gallery-item__ph">[GALLERY IMAGE 4]</span>
+        </li>
+        <li class="gallery-item gallery-item--wide" data-content="required" data-reveal>
+          <span class="gallery-item__ph">[GALLERY IMAGE 5]</span>
         </li>
       </ul>
     </section>
 
     <!-- ============================================================= -->
-    <!-- 4. SHOWROOMS  (TRUST)                                         -->
+    <!-- 4 · SHOWROOMS  (TRUST)                                        -->
     <!-- ============================================================= -->
-    <section id="showrooms" class="section section--light" data-reveal>
+    <section id="showrooms" class="section section--light showrooms">
       <div class="container">
-        <header class="section-head">
+        <header class="section-head" data-reveal>
           <p class="section-head__eyebrow" data-i18n="showrooms.eyebrow">Showrooms</p>
           <h2 class="section-head__title" data-i18n="showrooms.title">Visit us</h2>
         </header>
 
-        <div class="showrooms">
-          <!-- Placeholder showroom card. CONTENT REQUIRED: address, hours, coordinates, map. -->
-          <article class="showroom-card">
-            <div class="showroom-card__info">
-              <h3 class="showroom-card__name" data-content="required">
-                [SHOWROOM NAME — CONTENT REQUIRED]
-              </h3>
-              <p class="showroom-card__address" data-content="required">
-                NOT SPECIFIED IN PROJECT MATERIALS: showroom address
-              </p>
+        <article class="showroom-card" data-reveal>
+          <div class="showroom-card__info">
+            <h3 class="showroom-card__name" data-content="required">[SHOWROOM NAME — CONTENT REQUIRED]</h3>
+            <p class="showroom-card__address" data-content="required">
+              NOT SPECIFIED IN PROJECT MATERIALS: showroom address
+            </p>
+            <div class="showroom-card__meta">
               <div class="showroom-card__hours" data-content="required">
-                <p class="label" data-i18n="showrooms.hours">Opening hours</p>
-                <p>NOT SPECIFIED IN PROJECT MATERIALS: opening hours</p>
+                <p class="micro-label" data-i18n="showrooms.hours">Opening hours</p>
+                <p>NOT SPECIFIED IN PROJECT MATERIALS</p>
               </div>
-              <!-- Directions deep-link is non-functional until coordinates are confirmed -->
-              <a class="btn btn--ghost btn--sm is-disabled" href="#" aria-disabled="true"
-                 data-directions data-content="required"
-                 data-i18n="showrooms.directions">Get directions</a>
             </div>
+            <a class="btn btn--dark btn--sm is-disabled" href="#" aria-disabled="true"
+               data-directions data-content="required" data-i18n="showrooms.directions">Get directions</a>
+          </div>
 
-            <div class="showroom-card__map" data-map data-content="required" aria-hidden="true">
-              <span class="media-placeholder__tag">
-                [MAP — provider &amp; coordinates CONTENT REQUIRED]
-              </span>
-            </div>
-          </article>
-        </div>
+          <div class="showroom-card__map" data-map data-content="required" aria-hidden="true">
+            <span class="map-ph">[MAP — provider &amp; coordinates CONTENT REQUIRED]</span>
+          </div>
+        </article>
       </div>
     </section>
 
     <!-- ============================================================= -->
-    <!-- 5. REGISTER INTEREST  (REGISTER)                              -->
+    <!-- 5 · REGISTER INTEREST  (REGISTER)                             -->
     <!-- ============================================================= -->
-    <section id="register" class="section section--light" data-reveal>
+    <section id="register" class="section section--feature register">
       <div class="container container--narrow">
-        <header class="section-head">
+        <header class="section-head section-head--center" data-reveal>
           <p class="section-head__eyebrow" data-i18n="register.eyebrow">Register Interest</p>
           <h2 class="section-head__title" data-i18n="register.title">Be first to know</h2>
-          <p class="section-head__lead" data-content="required" data-i18n="register.lead">
-            [CONTENT REQUIRED: short supporting line — approx. 30 seconds to complete]
+          <p class="section-head__lead" data-i18n="register.lead">
+            Takes about 30 seconds. Our team follows up personally.
           </p>
         </header>
 
         <!--
-          Foundation only: no submission backend is wired.
+          Foundation: NO submission backend is wired.
           NOT SPECIFIED IN PROJECT MATERIALS: submission endpoint, sales recipient,
           running-sheet backup, spam-protection provider, PDPL consent wording.
-          Fields (confirmed by brief §9): Name, Phone, Emirate, Model of interest, consent.
+          Confirmed fields (brief §9): Name, Phone, Emirate, Model of interest, consent.
         -->
-        <form class="lead-form" data-lead-form novalidate>
-          <!-- Honeypot (bot trap) — visually hidden, must stay empty -->
+        <form class="lead-form" data-lead-form novalidate data-reveal>
+          <!-- Honeypot bot trap (visually hidden; must remain empty) -->
           <div class="hp-field" aria-hidden="true">
             <label for="company">Company</label>
             <input type="text" id="company" name="company" tabindex="-1" autocomplete="off">
@@ -323,8 +343,7 @@
 
           <div class="field">
             <label class="field__label" for="lead-name" data-i18n="form.name">Name</label>
-            <input class="field__input" type="text" id="lead-name" name="name"
-                   autocomplete="name" required>
+            <input class="field__input" type="text" id="lead-name" name="name" autocomplete="name" required>
           </div>
 
           <div class="field">
@@ -333,37 +352,40 @@
                    inputmode="tel" autocomplete="tel" required>
           </div>
 
-          <div class="field">
-            <label class="field__label" for="lead-emirate" data-i18n="form.emirate">Emirate</label>
-            <!-- The seven UAE emirates (standard geographic list) -->
-            <select class="field__input" id="lead-emirate" name="emirate" required>
-              <option value="" selected disabled data-i18n="form.select">Select…</option>
-              <option value="abu-dhabi">Abu Dhabi</option>
-              <option value="dubai">Dubai</option>
-              <option value="sharjah">Sharjah</option>
-              <option value="ajman">Ajman</option>
-              <option value="umm-al-quwain">Umm Al Quwain</option>
-              <option value="ras-al-khaimah">Ras Al Khaimah</option>
-              <option value="fujairah">Fujairah</option>
-            </select>
+          <div class="field-row">
+            <div class="field">
+              <label class="field__label" for="lead-emirate" data-i18n="form.emirate">Emirate</label>
+              <div class="select-wrap">
+                <select class="field__input" id="lead-emirate" name="emirate" required>
+                  <option value="" selected disabled data-i18n="form.select">Select…</option>
+                  <option value="abu-dhabi">Abu Dhabi</option>
+                  <option value="dubai">Dubai</option>
+                  <option value="sharjah">Sharjah</option>
+                  <option value="ajman">Ajman</option>
+                  <option value="umm-al-quwain">Umm Al Quwain</option>
+                  <option value="ras-al-khaimah">Ras Al Khaimah</option>
+                  <option value="fujairah">Fujairah</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="lead-model" data-i18n="form.model">Model of interest</label>
+              <div class="select-wrap">
+                <select class="field__input" id="lead-model" name="model" required>
+                  <option value="" selected disabled data-i18n="form.select">Select…</option>
+                  <option value="tivoli">Tivoli</option>
+                  <option value="torres">Torres</option>
+                  <option value="torres-hybrid">Torres Hybrid</option>
+                  <option value="actyon">Actyon</option>
+                  <option value="rexton">Rexton</option>
+                  <option value="musso">Musso</option>
+                  <option value="musso-ev">Musso EV</option>
+                </select>
+              </div>
+            </div>
           </div>
 
-          <div class="field">
-            <label class="field__label" for="lead-model" data-i18n="form.model">Model of interest</label>
-            <!-- Options mirror the potential lineup; final options follow confirmed lineup -->
-            <select class="field__input" id="lead-model" name="model" required>
-              <option value="" selected disabled data-i18n="form.select">Select…</option>
-              <option value="tivoli">Tivoli</option>
-              <option value="torres">Torres</option>
-              <option value="torres-hybrid">Torres Hybrid</option>
-              <option value="actyon">Actyon</option>
-              <option value="rexton">Rexton</option>
-              <option value="musso">Musso</option>
-              <option value="musso-ev">Musso EV</option>
-            </select>
-          </div>
-
-          <!-- PDPL consent — actual wording CONTENT REQUIRED -->
           <div class="field field--consent">
             <label class="consent">
               <input type="checkbox" name="consent" value="yes" required>
@@ -373,31 +395,31 @@
             </label>
           </div>
 
-          <button class="btn btn--primary btn--lg" type="submit"
-                  data-i18n="cta.register">Register Interest</button>
+          <button class="btn btn--primary btn--lg btn--block" type="submit" data-i18n="cta.register">
+            Register Interest
+          </button>
 
-          <!-- Status region (announced to assistive tech) -->
           <p class="form-status" role="status" aria-live="polite" data-form-status hidden></p>
         </form>
       </div>
     </section>
-
   </main>
 
   <!-- ============================================================= -->
-  <!-- PERSISTENT ACTION LAYER                                        -->
+  <!-- PERSISTENT ACTION LAYER · WhatsApp                             -->
   <!-- ============================================================= -->
   <div class="persistent-actions" data-persistent>
-    <!-- WhatsApp click-to-chat — CONTENT REQUIRED: number + default message -->
+    <!-- CONTENT REQUIRED: WhatsApp number + approved default message -->
     <a class="fab fab--whatsapp is-disabled" href="#" aria-disabled="true"
-       data-whatsapp data-content="required"
-       aria-label="WhatsApp (number required)">
-      <span class="fab__icon" aria-hidden="true">✆</span>
+       data-whatsapp data-content="required" aria-label="WhatsApp — number required">
+      <svg class="fab__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.87 9.87 0 004.74 1.2h.01c5.46 0 9.9-4.44 9.9-9.9 0-2.64-1.03-5.13-2.9-7C17.18 3.03 14.7 2 12.04 2zm0 18.02h-.01a8.2 8.2 0 01-4.18-1.14l-.3-.18-3.1.81.83-3.02-.2-.31a8.2 8.2 0 01-1.26-4.39c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 012.41 5.82c0 4.54-3.69 8.24-8.23 8.24zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.16.25-.64.81-.79.98-.14.16-.29.18-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.16.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.16 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.16 1.75 2.67 4.25 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.17-.47-.29z"/>
+      </svg>
       <span class="visually-hidden">WhatsApp — CONTENT REQUIRED</span>
     </a>
   </div>
 
-  <!-- PDPL consent notice placeholder (site-level) — wording CONTENT REQUIRED -->
+  <!-- Site-level PDPL consent notice placeholder — wording CONTENT REQUIRED -->
   <aside id="consent" class="consent-bar" data-consent hidden>
     <p data-content="required">[CONTENT REQUIRED: PDPL privacy &amp; consent notice]</p>
   </aside>
@@ -405,13 +427,14 @@
   <!-- ============================================================= -->
   <!-- FOOTER                                                        -->
   <!-- ============================================================= -->
-  <footer class="site-footer" role="contentinfo">
+  <footer class="site-footer">
     <div class="container site-footer__inner">
-      <p class="site-footer__brand">KGM UAE</p>
+      <div class="site-footer__brand">
+        <span class="brand__mark">KGM</span>
+        <span class="brand__sub" data-i18n="brand.sub">United Arab Emirates</span>
+      </div>
       <nav class="site-footer__links" aria-label="Footer">
-        <a href="#" data-content="required" data-i18n="footer.privacy">
-          [CONTENT REQUIRED: Privacy policy]
-        </a>
+        <a href="#" data-content="required" data-i18n="footer.privacy">[CONTENT REQUIRED: Privacy policy]</a>
       </nav>
       <p class="site-footer__legal" data-content="required">
         NOT SPECIFIED IN PROJECT MATERIALS: legal / copyright line
