@@ -1,0 +1,122 @@
+/* ============================================================
+   Typography — a two-script system that feels like one voice.
+   Latin: Big Shoulders Display (engineered, road-signage character)
+          + Manrope (geometric, warm, legible body).
+   Arabic: Cairo, matched weight and rhythm.
+   ============================================================ */
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+html[lang="ar"] h1,
+html[lang="ar"] h2,
+html[lang="ar"] h3,
+html[lang="ar"] h4 {
+  font-family: var(--font-arabic);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+.h1 { font-size: var(--step-h1); text-transform: uppercase; }
+.h2 { font-size: var(--step-h2); text-transform: uppercase; }
+.h3 { font-size: var(--step-h3); }
+
+html[lang="ar"] .h1,
+html[lang="ar"] .h2 { text-transform: none; }
+
+.lead {
+  font-size: var(--step-lead);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-on-void-muted);
+  max-width: 34ch;
+}
+.on-stone .lead { color: var(--color-on-stone-muted); }
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--step-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+html[lang="ar"] .eyebrow {
+  font-family: var(--font-arabic);
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 700;
+}
+
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 1.5em;
+  height: 1px;
+  background: var(--color-accent);
+}
+
+html[lang="ar"] .eyebrow::before { display: none; }
+html[dir="rtl"] .eyebrow::after {
+  content: "";
+  display: inline-block;
+  width: 1.5em;
+  height: 1px;
+  background: var(--color-accent);
+}
+
+p { max-width: 60ch; }
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: var(--step-stat);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--color-on-void);
+  font-variant-numeric: tabular-nums;
+}
+
+html[lang="ar"] .stat-value {
+  font-family: var(--font-arabic);
+  font-weight: 800;
+}
+
+.stat-label {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-on-void-muted);
+  margin-top: var(--space-3xs);
+}
+
+html[lang="ar"] .stat-label { letter-spacing: 0; text-transform: none; }
+
+.content-required-tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--color-on-void-muted);
+  border: 1px solid var(--color-void-line);
+  border-radius: var(--radius-sm);
+  padding: 0.2em 0.55em;
+}
+
+.on-stone .content-required-tag {
+  color: var(--color-on-stone-muted);
+  border-color: var(--color-stone-line);
+}
+
+html[lang="ar"] .content-required-tag { letter-spacing: 0; text-transform: none; }

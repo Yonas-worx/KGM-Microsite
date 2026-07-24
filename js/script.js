@@ -22,6 +22,8 @@
 
 'use strict';
 
+import { MODELS } from '../data/models.js';
+
 /* ---------------------------------------------------------------------------
    i18n — UI chrome strings only
    --------------------------------------------------------------------------- */
@@ -293,7 +295,10 @@ const models = {
     this.next = document.querySelector('[data-models-next]');
     if (!this.viewport || !this.track) return;
 
+    this.render();                 // build cards from the data structure
+    this.syncFormOptions();        // keep the form's model <select> in sync
     this.cards = Array.from(this.track.children);
+    if (!this.cards.length) return;
 
     // Controls only make sense when content overflows the viewport.
     const overflows = this.track.scrollWidth > this.viewport.clientWidth + 4;
@@ -307,6 +312,59 @@ const models = {
     this.refresh();
 
     window.__kgmModels = this; // allow i18n direction changes to refresh edges
+  },
+
+  // Render the slider track from the MODELS data structure.
+  render() {
+    if (!Array.isArray(MODELS) || !MODELS.length) return;
+    this.track.innerHTML = MODELS.map((m, i) => this.cardHTML(m, i)).join('');
+  },
+
+  cardHTML(model, i) {
+    const index = String(i + 1).padStart(2, '0');
+    const hasImage = Boolean(model.image);
+    const media = hasImage
+      ? `<img class="model-card__img" src="${model.image}" alt="${model.name}" loading="lazy" decoding="async">`
+      : '<span class="model-card__ph">[MODEL IMAGE]</span>';
+
+    const keyNumbers = (model.keyNumbers || []);
+    const knNeedsContent = keyNumbers.some((kn) => !kn || kn.value == null);
+    const knHTML = keyNumbers.map((kn, j) => {
+      const value = kn && kn.value != null ? kn.value : '—';
+      const label = kn && kn.label != null ? kn.label : `[KEY NUMBER ${j + 1}]`;
+      return `<div class="key-number"><dd>${value}</dd><dt>${label}</dt></div>`;
+    }).join('');
+
+    return (
+      `<li class="model-card" data-reveal>` +
+        `<div class="model-card__media"${hasImage ? '' : ' data-content="required"'}>` +
+          media +
+          `<span class="model-card__index">${index}</span>` +
+        `</div>` +
+        `<div class="model-card__body">` +
+          `<h3 class="model-card__name">${model.name}</h3>` +
+          `<dl class="key-numbers"${knNeedsContent ? ' data-content="required"' : ''} aria-label="Key figures">` +
+            knHTML +
+          `</dl>` +
+        `</div>` +
+      `</li>`
+    );
+  },
+
+  // Single source of truth: rebuild the form's model options from MODELS,
+  // preserving the leading "Select…" placeholder (keeps its data-i18n).
+  syncFormOptions() {
+    const select = document.querySelector('#lead-model');
+    if (!select || !Array.isArray(MODELS) || !MODELS.length) return;
+    const placeholder = select.querySelector('option[value=""]');
+    select.textContent = '';
+    if (placeholder) select.appendChild(placeholder);
+    MODELS.forEach((m) => {
+      const opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = m.name;
+      select.appendChild(opt);
+    });
   },
 
   step() {

@@ -1,0 +1,129 @@
+/* ============================================================
+   Layout — container, section scaffolding, logical properties.
+   Authored LTR-first using logical properties so RTL mirrors free.
+   ============================================================ */
+
+.container {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.container--narrow {
+  max-width: var(--container-narrow);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.full-bleed {
+  width: 100%;
+}
+
+main {
+  display: block;
+}
+
+.scene {
+  position: relative;
+  padding-block: var(--space-3xl);
+}
+
+.scene--flush { padding-block: 0; }
+
+.scene--dark { background: var(--color-void); color: var(--color-on-void); }
+.scene--stone {
+  background: var(--color-stone);
+  color: var(--color-on-stone);
+}
+.scene--stone .eyebrow { color: var(--color-accent-ink); }
+
+.scene-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.scene-head--row {
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+@media (max-width: 720px) {
+  .scene-head--row { flex-direction: column; align-items: flex-start; }
+}
+
+.on-stone { color: var(--color-on-stone); }
+
+/* ---- Utility stack / row ---- */
+.stack { display: flex; flex-direction: column; }
+.row { display: flex; flex-wrap: wrap; align-items: center; }
+
+.gap-2xs { gap: var(--space-2xs); }
+.gap-xs { gap: var(--space-xs); }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
+.gap-lg { gap: var(--space-lg); }
+
+/* ---- Divider ---- */
+.hairline {
+  border: none;
+  border-block-start: 1px solid var(--color-void-line);
+}
+.scene--stone .hairline { border-block-start-color: var(--color-stone-line); }
+
+/* ---- Visually hidden until in view (JS toggles .is-visible) ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity var(--dur-slow) var(--ease-cinematic),
+              transform var(--dur-slow) var(--ease-cinematic);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ---- Journey thread (desktop only, decorative-but-informative progress) ---- */
+.journey-thread {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: var(--space-md);
+  z-index: 40;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  pointer-events: none;
+}
+
+@media (min-width: 1024px) {
+  .journey-thread { display: flex; }
+}
+
+.journey-thread__stage {
+  writing-mode: vertical-rl;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-on-void-muted);
+  opacity: 0.5;
+  transition: opacity var(--dur-base) var(--ease-cinematic), color var(--dur-base);
+}
+.journey-thread__stage.is-active {
+  opacity: 1;
+  color: var(--color-accent);
+}
+.journey-thread__line {
+  width: 1px;
+  flex: 1;
+  background: var(--color-void-line);
+}
+
+html[dir="rtl"] .journey-thread { inset-inline-end: auto; inset-inline-start: var(--space-md); }

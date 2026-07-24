@@ -1,0 +1,140 @@
+/* ============================================================
+   KGM UAE Microsite — Base & Design Tokens
+   "The Arrival" — dark cinematic foundation, one restrained accent.
+   ============================================================ */
+
+/* ---- Reset ---- */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+img, picture, video, svg { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; }
+button { background: none; border: none; cursor: pointer; }
+
+/* ---- Design tokens ---- */
+:root {
+  /* Colour — dark cinematic foundation (hero / immersive scenes) */
+  --color-void: #0a0b0d;
+  --color-void-raised: #17191d;
+  --color-void-line: rgba(244, 243, 239, 0.14);
+  --color-on-void: #f4f3ef;
+  --color-on-void-muted: #9a9c9f;
+
+  /* Colour — light reading surface (showrooms / register) */
+  --color-stone: #e8e6df;
+  --color-stone-raised: #ffffff;
+  --color-stone-line: rgba(20, 22, 26, 0.14);
+  --color-on-stone: #14161a;
+  --color-on-stone-muted: #5b5d61;
+
+  /* Single accent — reserved for the primary conversion action */
+  --color-accent: #c7a15c;
+  --color-accent-strong: #ddbb78;
+  --color-accent-ink: #14120a;
+
+  /* WhatsApp — its own brand green, secondary in weight */
+  --color-whatsapp: #25d366;
+  --color-whatsapp-ink: #05170c;
+
+  /* Status */
+  --color-error: #e0685a;
+  --color-success: #7fb88a;
+
+  /* Type families */
+  --font-display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-arabic: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Type scale — fluid, few sizes, deliberate */
+  --step-eyebrow: 0.72rem;
+  --step-body: clamp(0.95rem, 0.85rem + 0.3vw, 1.05rem);
+  --step-lead: clamp(1.15rem, 1rem + 0.6vw, 1.4rem);
+  --step-h3: clamp(1.6rem, 1.3rem + 1.2vw, 2.2rem);
+  --step-h2: clamp(2.4rem, 1.8rem + 2.4vw, 3.6rem);
+  --step-h1: clamp(2.8rem, 1.6rem + 5vw, 6rem);
+  --step-stat: clamp(2.2rem, 1.6rem + 2.6vw, 3.4rem);
+
+  /* Space scale */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: 6rem;
+  --space-3xl: 9rem;
+
+  /* Layout */
+  --container: 1280px;
+  --container-narrow: 640px;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+
+  /* Motion */
+  --ease-cinematic: cubic-bezier(0.16, 0.7, 0.24, 1);
+  --dur-fast: 180ms;
+  --dur-base: 420ms;
+  --dur-slow: 900ms;
+
+  /* Radius — minimal, purposeful only */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-fast: 1ms; --dur-base: 1ms; --dur-slow: 1ms; }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  background: var(--color-void);
+  color: var(--color-on-void);
+  font-family: var(--font-body);
+  font-size: var(--step-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+html[lang="ar"] body {
+  font-family: var(--font-arabic);
+}
+
+/* ---- Focus & a11y ---- */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  inset-inline-start: var(--space-sm);
+  z-index: 1000;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  padding: var(--space-2xs) var(--space-sm);
+  font-weight: 700;
+  transition: top var(--dur-fast) var(--ease-cinematic);
+}
+.skip-link:focus {
+  top: var(--space-sm);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0; padding: 0; margin: -1px;
+}

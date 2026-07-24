@@ -1,0 +1,82 @@
+[
+  {
+    "id": "tivoli",
+    "name": "Tivoli",
+    "image": "assets/img/models/tivoli.png",
+    "category": "Compact SUV",
+    "description": null,
+    "keyNumbers": [null, null, null]
+  },
+  {
+    "id": "korando",
+    "name": "Korando",
+    "image": "assets/img/models/korando.png",
+    "category": "Compact SUV",
+    "description": null,
+    "keyNumbers": [null, null, null]
+  },
+  {
+    "id": "torres",
+    "name": "Torres",
+    "image": "assets/img/models/torres.png",
+    "category": "Mid-size SUV",
+    "description": null,
+    "keyNumbers": [null, null, null]
+  },
+  {
+    "id": "torres-hybrid",
+    "name": "Torres Hybrid",
+    "image": "assets/img/models/torres-hybrid.png",
+    "category": "Mid-size SUV — Hybrid",
+    "description": null,
+    "keyNumbers": [null, null, null]
+  },
+  {
+    "id": "torres-evx",
+    "name": "Torres EVX",
+    "image": "assets/img/models/torres-evx.png",
+    "category": "Mid-size SUV — Electric",
+    "description": null,
+    "keyNumbers": [null, null, null]
+  },
+  {
+    "id": "actyon",
+    "name": "Actyon",
+    "image": "assets/img/models/actyon.png",
+    "category": "SUV Coupe",
+    "description": null,
+    "keyNumbers": [null, null, null]
+  },
+  {
+    "id": "actyon-hybrid",
+    "name": "Actyon Hybrid",
+    "image": "assets/img/models/actyon-hybrid.png",
+    "category": "SUV Coupe — Hybrid",
+    "description": null,
+    "keyNumbers": [null, null, null]
+  },
+  {
+    "id": "rexton",
+    "name": "Rexton",
+    "image": "assets/img/models/rexton.png",
+    "category": "Full-size SUV",
+    "description": null,
+    "keyNumbers": [null, null, null]
+  },
+  {
+    "id": "musso",
+    "name": "Musso",
+    "image": "assets/img/models/musso.png",
+    "category": "Pickup",
+    "description": null,
+    "keyNumbers": [null, null, null]
+  },
+  {
+    "id": "musso-ev",
+    "name": "Musso EV",
+    "image": "assets/img/models/musso-ev.png",
+    "category": "Pickup — Electric",
+    "description": null,
+    "keyNumbers": [null, null, null]
+  }
+]

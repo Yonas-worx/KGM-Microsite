@@ -1,0 +1,25 @@
+/* ============================================================
+   RTL-only overrides.
+   Everything else is handled by logical properties in the other
+   partials (margin-inline, inset-inline, text-align: start/end,
+   border-inline, etc.) — this file holds only the exceptions.
+   ============================================================ */
+
+html[dir="rtl"] .icon-flip {
+  transform: scaleX(-1);
+}
+
+/* Numerals, phone numbers and the KGM wordmark stay LTR inside RTL flow */
+html[dir="rtl"] .stat-value,
+html[dir="rtl"] .keep-ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* Model carousel: content authored LTR-first; native `dir` flips scroll
+   axis and flex order automatically. JS mirrors the "next" direction
+   (see models.js) so swipe/advance always matches reading direction. */
+
+/* Hero scrim gradient is vertical, no mirroring required. */
+
+/* Toast / consent banner already use logical inset-inline in components.css. */
