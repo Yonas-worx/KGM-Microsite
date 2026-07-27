@@ -1,4 +1,4 @@
-// Auto-converted from content.en.json so it loads via plain <script> (works under file:// with no server).
+// Auto-converted from content.en.json for plain-script loading.
 window.KGM_CONTENT_EN = {
   "_meta": {
     "status": "DRAFT — placeholder copy for build/demo purposes only. Not approved brand copy. See project-brief.md §13 item 16.",
@@ -9,13 +9,15 @@ window.KGM_CONTENT_EN = {
     "description": "CONTENT REQUIRED — approved SEO meta description pending."
   },
   "nav": {
-    "models": "The Models",
-    "gallery": "Gallery",
+    "models": "KGM Lineup",
     "showrooms": "Showrooms",
     "register": "Register Interest",
     "skipLink": "Skip to content"
   },
-  "langSwitch": { "en": "EN", "ar": "AR" },
+  "langSwitch": {
+    "en": "EN",
+    "ar": "AR"
+  },
   "hero": {
     "eyebrow": "KGM UAE — Arriving August 2026",
     "headline": "KGM has arrived in the UAE",
@@ -25,13 +27,16 @@ window.KGM_CONTENT_EN = {
     "scrollCue": "Scroll"
   },
   "models": {
-    "eyebrow": "The Lineup",
-    "heading": "Explore the range",
-    "sub": "Names, hero shots and key numbers only — swipe or use the arrows to move through the confirmed KGM UAE lineup.",
-    "contentRequired": "Spec pending",
+    "eyebrow": "KGM Lineup",
+    "heading": "Meet the full lineup",
+    "sub": "Explore the KGM range. Hover over a model for a closer look.",
     "cta": "Register interest",
-    "prev": "Previous model",
-    "next": "Next model"
+    "prev": "Previous models",
+    "next": "Next models",
+    "filters": {
+      "suv": "SUV",
+      "pickup": "Pickup"
+    }
   },
   "gallery": {
     "eyebrow": "The Gallery",
@@ -77,7 +82,13 @@ window.KGM_CONTENT_EN = {
     "endpointNotice": "Draft build: no submission endpoint is connected yet (CONTENT REQUIRED — project-brief.md §13 item 8)."
   },
   "emirates": [
-    "Abu Dhabi", "Dubai", "Sharjah", "Ajman", "Umm Al Quwain", "Ras Al Khaimah", "Fujairah"
+    "Abu Dhabi",
+    "Dubai",
+    "Sharjah",
+    "Ajman",
+    "Umm Al Quwain",
+    "Ras Al Khaimah",
+    "Fujairah"
   ],
   "whatsapp": {
     "label": "Chat on WhatsApp",
@@ -90,9 +101,29 @@ window.KGM_CONTENT_EN = {
     "decline": "Decline"
   },
   "footer": {
-    "legal": "\u00a9 2026 KGM UAE. All rights reserved. Legal & privacy copy CONTENT REQUIRED.",
+    "legal": "© 2026 KGM UAE. All rights reserved. Legal & privacy copy CONTENT REQUIRED.",
     "privacy": "Privacy & PDPL",
     "contentRequiredNote": "This is a build-stage demonstration. Vehicle imagery shown is official KGM product photography; specifications, showroom details, and legal copy are placeholders pending approved project content."
   },
-  "contentRequiredBadge": "Content required"
+  "contentRequiredBadge": "Content required",
+  "campaign": {
+    "eyebrow": "Your Next KGM",
+    "heading": "Made for what comes next",
+    "sub": "Three distinct expressions of confidence, capability and movement.",
+    "torres": {
+      "name": "Torres",
+      "line1": "Unexpected",
+      "line2": "Adventure"
+    },
+    "mussoEv": {
+      "name": "Musso EV",
+      "line1": "New tools.",
+      "line2": "New life."
+    },
+    "actyon": {
+      "name": "Actyon",
+      "line1": "Ready.",
+      "line2": "Action. Actyon."
+    }
+  }
 };

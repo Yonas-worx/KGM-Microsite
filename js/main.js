@@ -63,7 +63,7 @@ window.KGM = window.KGM || {};
 
   function initJourneyThread() {
     const stages = document.querySelectorAll('.journey-thread__stage');
-    const sections = ['hero', 'models', 'gallery', 'showrooms', 'register']
+    const sections = ['hero', 'models', 'showrooms', 'register']
       .map((id) => document.getElementById(id))
       .filter(Boolean);
     if (!stages.length || !sections.length || !('IntersectionObserver' in window)) return;
@@ -79,25 +79,36 @@ window.KGM = window.KGM || {};
     sections.forEach((s) => io.observe(s));
   }
 
-  function initVideoReducedMotion() {
+  function initHeroVideo() {
     const video = document.getElementById('hero-video');
     if (!video) return;
     const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+
     if (mql.matches) {
       video.removeAttribute('autoplay');
       video.pause();
+      return;
     }
+
+    const play = () => video.play().catch(() => {});
+    video.addEventListener('canplay', play, { once: true });
+    video.addEventListener('ended', () => {
+      video.currentTime = 0;
+      play();
+    });
+    if (video.readyState >= 3) play();
   }
 
   function boot() {
     window.KGM.i18n.initI18n();
 
     const models = window.KGM_MODELS || [];
-    const gallery = window.KGM_GALLERY || [];
     const showrooms = window.KGM_SHOWROOMS || [];
 
     window.KGM.models.renderModels(models);
-    window.KGM.gallery.renderGallery(gallery);
     window.KGM.showrooms.renderShowrooms(showrooms);
     window.KGM.models.populateModelSelect(models);
 
@@ -110,13 +121,12 @@ window.KGM = window.KGM || {};
     initRegisterCtaTracking();
     initReveal();
     initJourneyThread();
-    initVideoReducedMotion();
+    initHeroVideo();
 
     window.KGM.i18n.onLanguageChange(() => {
       window.KGM.models.reflowOnLanguageChange();
       window.KGM.models.populateModelSelect(models);
       window.KGM.showrooms.renderShowrooms(showrooms);
-      window.KGM.gallery.renderGallery(gallery);
     });
 
     document.body.classList.add('is-ready');

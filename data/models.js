@@ -1,83 +1,51 @@
-// Auto-converted from models.json so it loads via plain <script> (works under file:// with no server).
+// KGM UAE model lineup. Official lineup photography is used where supplied.
 window.KGM_MODELS = [
   {
-    id: "tivoli",
-    name: "Tivoli",
-    image: "assets/models/tivoli.png",
-    category: "Compact SUV",
-    description: null,
-    keyNumbers: [null, null, null],
+    "id": "tivoli",
+    "name": "Tivoli",
+    "image": "assets/brand/KGM line up/Tivoli.jpg",
+    "type": "suv"
   },
   {
-    id: "korando",
-    name: "Korando",
-    image: "assets/models/korando.png",
-    category: "Compact SUV",
-    description: null,
-    keyNumbers: [null, null, null],
+    "id": "torres",
+    "name": "Torres",
+    "image": "assets/brand/KGM line up/Torres.jpg",
+    "type": "suv"
   },
   {
-    id: "torres",
-    name: "Torres",
-    image: "assets/models/torres.png",
-    category: "Mid-size SUV",
-    description: null,
-    keyNumbers: [null, null, null],
+    "id": "torres-hybrid",
+    "name": "Torres Hybrid",
+    "image": "assets/brand/KGM line up/Torres Hybrid.jpg",
+    "type": "suv"
   },
   {
-    id: "torres-hybrid",
-    name: "Torres Hybrid",
-    image: "assets/models/torres-hybrid.png",
-    category: "Mid-size SUV — Hybrid",
-    description: null,
-    keyNumbers: [null, null, null],
+    "id": "torres-evx",
+    "name": "Torres EVX",
+    "image": "assets/brand/KGM line up/Torres EVX.jpg",
+    "type": "suv"
   },
   {
-    id: "torres-evx",
-    name: "Torres EVX",
-    image: "assets/models/torres-evx.png",
-    category: "Mid-size SUV — Electric",
-    description: null,
-    keyNumbers: [null, null, null],
+    "id": "actyon",
+    "name": "Actyon",
+    "image": "assets/brand/KGM line up/Actyon.jpg",
+    "type": "suv"
   },
   {
-    id: "actyon",
-    name: "Actyon",
-    image: "assets/models/actyon.png",
-    category: "SUV Coupe",
-    description: null,
-    keyNumbers: [null, null, null],
+    "id": "rexton",
+    "name": "Rexton",
+    "image": "assets/brand/KGM line up/Rexton.jpg",
+    "type": "suv"
   },
   {
-    id: "actyon-hybrid",
-    name: "Actyon Hybrid",
-    image: "assets/models/actyon-hybrid.png",
-    category: "SUV Coupe — Hybrid",
-    description: null,
-    keyNumbers: [null, null, null],
+    "id": "musso",
+    "name": "Musso",
+    "image": "assets/brand/KGM line up/Musso.jpg",
+    "type": "pickup"
   },
   {
-    id: "rexton",
-    name: "Rexton",
-    image: "assets/models/rexton.png",
-    category: "Full-size SUV",
-    description: null,
-    keyNumbers: [null, null, null],
-  },
-  {
-    id: "musso",
-    name: "Musso",
-    image: "assets/models/musso.png",
-    category: "Pickup",
-    description: null,
-    keyNumbers: [null, null, null],
-  },
-  {
-    id: "musso-ev",
-    name: "Musso EV",
-    image: "assets/models/musso-ev.png",
-    category: "Pickup — Electric",
-    description: null,
-    keyNumbers: [null, null, null],
-  },
+    "id": "musso-ev",
+    "name": "Musso EV",
+    "image": "assets/brand/KGM line up/Musso EV.jpg",
+    "type": "pickup"
+  }
 ];

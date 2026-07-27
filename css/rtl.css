@@ -23,3 +23,6 @@ html[dir="rtl"] .keep-ltr {
 /* Hero scrim gradient is vertical, no mirroring required. */
 
 /* Toast / consent banner already use logical inset-inline in components.css. */
+
+html[dir="rtl"] .campaign-card__copy { text-align: right; }
+html[dir="rtl"] .model-slide__body { text-align: right; }
