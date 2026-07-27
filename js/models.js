@@ -1,17 +1,22 @@
-// models.js — smooth filtered lineup rail with continuous autoplay.
+// models.js — seamless, continuous KGM lineup carousel.
 window.KGM = window.KGM || {};
 
 (function () {
+  "use strict";
+
+  const AUTOPLAY_SPEED = 26;
+  const RESUME_DELAY = 900;
+
   let allModels = [];
   let visibleModels = [];
   let activeFilter = "suv";
   let trackEl = null;
   let animationFrame = null;
   let previousTime = null;
-  let scrollTimer = null;
+  let loopWidth = 0;
   let autoplayPaused = false;
-
-  const AUTOPLAY_SPEED = 24;
+  let resumeTimer = null;
+  let resizeTimer = null;
 
   function t(key) {
     return window.KGM.i18n.t(key);
@@ -21,40 +26,50 @@ window.KGM = window.KGM || {};
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
-  function isRtl() {
-    return window.KGM.i18n.getDir() === "rtl";
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
 
   function renderSlide(model, index, duplicate) {
+    const name = escapeHtml(model.name);
+    const id = escapeHtml(model.id);
+    const image = escapeHtml(model.image);
+
     return `
       <article
         class="model-slide"
-        data-model-id="${model.id}"
+        data-model-id="${id}"
         data-index="${index}"
         ${duplicate ? 'aria-hidden="true"' : ""}
         role="group"
         aria-roledescription="slide"
-        aria-label="${model.name}"
+        aria-label="${name}"
       >
         <img
           class="model-slide__image"
-          src="${model.image}"
-          alt="${duplicate ? "" : model.name}"
+          src="${image}"
+          alt="${duplicate ? "" : name}"
           loading="${index < 4 ? "eager" : "lazy"}"
           decoding="async"
-        >
+          draggable="false"
+        />
 
         <span class="model-slide__shade" aria-hidden="true"></span>
 
         <div class="model-slide__content">
-          <h3 class="model-slide__name">${model.name}</h3>
+          <h3 class="model-slide__name">${name}</h3>
 
           <button
             type="button"
             class="model-slide__link"
-            data-select-model="${model.id}"
+            data-select-model="${id}"
           >
-            ${t("models.cta")}
+            ${escapeHtml(t("models.cta"))}
             <span aria-hidden="true">↗</span>
           </button>
         </div>
@@ -62,33 +77,55 @@ window.KGM = window.KGM || {};
     `;
   }
 
+  function measureLoop() {
+    if (!trackEl || visibleModels.length < 2) {
+      loopWidth = 0;
+      return;
+    }
+
+    loopWidth = trackEl.scrollWidth / 2;
+  }
+
+  function normalizePosition() {
+    if (!trackEl || loopWidth <= 0) return;
+
+    while (trackEl.scrollLeft >= loopWidth) {
+      trackEl.scrollLeft -= loopWidth;
+    }
+
+    while (trackEl.scrollLeft < 0) {
+      trackEl.scrollLeft += loopWidth;
+    }
+  }
+
   function renderCurrentFilter() {
     visibleModels = allModels.filter((model) => model.type === activeFilter);
 
     if (!trackEl) return;
 
-    const firstCopy = visibleModels
+    stopAutoplay();
+
+    const originalSlides = visibleModels
       .map((model, index) => renderSlide(model, index, false))
       .join("");
 
-    const secondCopy =
+    const duplicateSlides =
       visibleModels.length > 1
         ? visibleModels
             .map((model, index) => renderSlide(model, index, true))
             .join("")
         : "";
 
-    trackEl.innerHTML = firstCopy + secondCopy;
+    trackEl.innerHTML = originalSlides + duplicateSlides;
+    trackEl.scrollLeft = 0;
 
-    trackEl.scrollTo({
-      left: 0,
-      behavior: "auto",
+    requestAnimationFrame(() => {
+      measureLoop();
+      previousTime = null;
+      startAutoplay();
     });
 
-    previousTime = null;
-
     populateModelSelect(allModels);
-    startContinuousAutoplay();
   }
 
   function setFilter(filter) {
@@ -97,10 +134,9 @@ window.KGM = window.KGM || {};
     activeFilter = filter;
 
     document.querySelectorAll("[data-model-filter]").forEach((button) => {
-      const active = button.dataset.modelFilter === filter;
-
-      button.classList.toggle("is-active", active);
-      button.setAttribute("aria-pressed", String(active));
+      const isActive = button.dataset.modelFilter === filter;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
     });
 
     renderCurrentFilter();
@@ -108,88 +144,77 @@ window.KGM = window.KGM || {};
 
   function cardStep() {
     const card = trackEl?.querySelector(".model-slide");
-
     if (!card) return 320;
 
-    const gap = parseFloat(getComputedStyle(trackEl).gap || "0") || 0;
+    const style = getComputedStyle(trackEl);
+    const gap = parseFloat(style.columnGap || style.gap || "0") || 0;
 
     return card.getBoundingClientRect().width + gap;
   }
 
-  function originalTrackWidth() {
-    if (!trackEl || visibleModels.length < 2) return 0;
-
-    return trackEl.scrollWidth / 2;
-  }
-
-  function normalizedScroll() {
-    if (!trackEl) return 0;
-
-    return Math.abs(trackEl.scrollLeft);
-  }
-
-  function resetLoopIfNeeded() {
-    if (!trackEl || visibleModels.length < 2) return;
-
-    const loopWidth = originalTrackWidth();
-    const current = normalizedScroll();
-
-    if (current >= loopWidth) {
-      const overflow = current - loopWidth;
-      const direction = isRtl() ? -1 : 1;
-
-      trackEl.scrollTo({
-        left: overflow * direction,
-        behavior: "auto",
-      });
-    }
-  }
-
-  function continuousAutoplay(timestamp) {
+  function autoplayFrame(timestamp) {
     if (!trackEl) return;
 
     if (previousTime === null) {
       previousTime = timestamp;
     }
 
-    const elapsed = timestamp - previousTime;
+    const elapsed = Math.min(timestamp - previousTime, 50);
     previousTime = timestamp;
 
-    if (!autoplayPaused && !reduceMotion() && visibleModels.length > 1) {
-      const direction = isRtl() ? -1 : 1;
-      const movement = AUTOPLAY_SPEED * (elapsed / 1000);
-
-      trackEl.scrollLeft += movement * direction;
-
-      resetLoopIfNeeded();
+    if (
+      !autoplayPaused &&
+      !reduceMotion() &&
+      visibleModels.length > 1 &&
+      loopWidth > 0
+    ) {
+      trackEl.scrollLeft += AUTOPLAY_SPEED * (elapsed / 1000);
+      normalizePosition();
     }
 
-    animationFrame = window.requestAnimationFrame(continuousAutoplay);
+    animationFrame = requestAnimationFrame(autoplayFrame);
   }
 
-  function startContinuousAutoplay() {
-    if (animationFrame) return;
+  function startAutoplay() {
+    if (animationFrame !== null) return;
 
     previousTime = null;
-    animationFrame = window.requestAnimationFrame(continuousAutoplay);
+    animationFrame = requestAnimationFrame(autoplayFrame);
+  }
+
+  function stopAutoplay() {
+    if (animationFrame !== null) {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = null;
+    }
+
+    previousTime = null;
   }
 
   function pauseAutoplay() {
     autoplayPaused = true;
+    previousTime = null;
+    window.clearTimeout(resumeTimer);
   }
 
-  function resumeAutoplay() {
-    autoplayPaused = false;
-    previousTime = null;
+  function resumeAutoplay(delay = 0) {
+    window.clearTimeout(resumeTimer);
+
+    resumeTimer = window.setTimeout(() => {
+      autoplayPaused = false;
+      previousTime = null;
+    }, delay);
   }
 
   function scrollByCards(direction) {
-    if (!trackEl) return;
+    if (!trackEl || visibleModels.length === 0) return;
 
-    const directionSign = isRtl() ? -1 : 1;
+    if (direction < 0 && trackEl.scrollLeft <= 1 && loopWidth > 0) {
+      trackEl.scrollLeft += loopWidth;
+    }
 
     trackEl.scrollBy({
-      left: cardStep() * direction * directionSign,
+      left: cardStep() * direction,
       behavior: reduceMotion() ? "auto" : "smooth",
     });
   }
@@ -201,48 +226,69 @@ window.KGM = window.KGM || {};
 
     if (!select) return;
 
-    const current = select.value;
-    const placeholder = select.querySelector('option[value=""]');
-
-    const sorted = [...data].sort((a, b) =>
-      a.name.localeCompare(b.name, "en", {
-        sensitivity: "base",
-      }),
-    );
+    const currentValue = select.value;
+    const placeholderText =
+      select.querySelector('option[value=""]')?.textContent ||
+      t("register.fields.modelPlaceholder");
 
     select.innerHTML = "";
 
-    if (placeholder) {
-      select.appendChild(placeholder);
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = placeholderText;
+    select.appendChild(placeholder);
+
+    [...data]
+      .sort((a, b) =>
+        a.name.localeCompare(b.name, "en", { sensitivity: "base" }),
+      )
+      .forEach((model) => {
+        const option = document.createElement("option");
+        option.value = model.id;
+        option.textContent = model.name;
+        select.appendChild(option);
+      });
+
+    if ([...select.options].some((option) => option.value === currentValue)) {
+      select.value = currentValue;
     }
+  }
 
-    sorted.forEach((model) => {
-      const option = document.createElement("option");
+  function handleModelSelection(event) {
+    const button = event.target.closest("[data-select-model]");
+    if (!button) return;
 
-      option.value = model.id;
-      option.textContent = model.name;
+    const id = button.dataset.selectModel;
 
-      select.appendChild(option);
+    window.KGM.form?.prefillModel(id);
+    window.KGM.analytics?.track("register_cta_click", {
+      cta_location: "model_card",
+      model_name: id,
     });
 
-    if ([...select.options].some((option) => option.value === current)) {
-      select.value = current;
-    }
+    document.getElementById("register")?.scrollIntoView({
+      behavior: reduceMotion() ? "auto" : "smooth",
+      block: "start",
+    });
+
+    window.setTimeout(() => {
+      document
+        .querySelector('#register-form [name="name"]')
+        ?.focus({ preventScroll: true });
+    }, 550);
   }
 
   function bindEvents() {
     document.getElementById("model-prev")?.addEventListener("click", () => {
       pauseAutoplay();
       scrollByCards(-1);
-
-      window.setTimeout(resumeAutoplay, 900);
+      resumeAutoplay(RESUME_DELAY);
     });
 
     document.getElementById("model-next")?.addEventListener("click", () => {
       pauseAutoplay();
       scrollByCards(1);
-
-      window.setTimeout(resumeAutoplay, 900);
+      resumeAutoplay(RESUME_DELAY);
     });
 
     document.querySelectorAll("[data-model-filter]").forEach((button) => {
@@ -251,59 +297,39 @@ window.KGM = window.KGM || {};
       });
     });
 
-    trackEl.addEventListener(
-      "scroll",
-      () => {
-        window.clearTimeout(scrollTimer);
-
-        scrollTimer = window.setTimeout(resetLoopIfNeeded, 80);
-      },
-      { passive: true },
-    );
+    trackEl.addEventListener("scroll", normalizePosition, { passive: true });
 
     trackEl.addEventListener("keydown", (event) => {
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
-        return;
-      }
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
 
       event.preventDefault();
       pauseAutoplay();
-
       scrollByCards(event.key === "ArrowRight" ? 1 : -1);
-
-      window.setTimeout(resumeAutoplay, 900);
+      resumeAutoplay(RESUME_DELAY);
     });
 
-    trackEl.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-select-model]");
-
-      if (!button) return;
-
-      const id = button.dataset.selectModel;
-
-      window.KGM.form.prefillModel(id);
-
-      window.KGM.analytics.track("register_cta_click", {
-        cta_location: "model_card",
-        model_name: id,
-      });
-
-      document.getElementById("register")?.scrollIntoView({
-        behavior: reduceMotion() ? "auto" : "smooth",
-        block: "start",
-      });
-
-      window.setTimeout(() => {
-        document
-          .querySelector('#register-form [name="name"]')
-          ?.focus({ preventScroll: true });
-      }, 550);
-    });
+    trackEl.addEventListener("click", handleModelSelection);
 
     trackEl.addEventListener("pointerenter", pauseAutoplay);
-    trackEl.addEventListener("pointerleave", resumeAutoplay);
+    trackEl.addEventListener("pointerleave", () => resumeAutoplay());
+    trackEl.addEventListener("pointerdown", pauseAutoplay);
+    trackEl.addEventListener("pointerup", () => resumeAutoplay(RESUME_DELAY));
+    trackEl.addEventListener("touchstart", pauseAutoplay, { passive: true });
+    trackEl.addEventListener(
+      "touchend",
+      () => resumeAutoplay(RESUME_DELAY),
+      { passive: true },
+    );
     trackEl.addEventListener("focusin", pauseAutoplay);
-    trackEl.addEventListener("focusout", resumeAutoplay);
+    trackEl.addEventListener("focusout", () => resumeAutoplay());
+
+    window.addEventListener("resize", () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        measureLoop();
+        normalizePosition();
+      }, 150);
+    });
 
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
@@ -316,7 +342,6 @@ window.KGM = window.KGM || {};
 
   function renderModels(data) {
     allModels = Array.isArray(data) ? data : [];
-
     trackEl = document.getElementById("model-track");
 
     if (!trackEl) return;
@@ -327,7 +352,6 @@ window.KGM = window.KGM || {};
 
   function reflowOnLanguageChange() {
     if (!trackEl) return;
-
     renderCurrentFilter();
   }
 

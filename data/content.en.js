@@ -7,7 +7,7 @@ window.KGM_CONTENT_EN = {
   },
   meta: {
     title: "KGM — Arriving in the UAE",
-    description: "CONTENT REQUIRED — approved SEO meta description pending.",
+    description: "Discover the KGM vehicle lineup arriving in the UAE, explore upcoming models, find showrooms and register your interest.",
   },
   nav: {
     models: "KGM Lineup",
@@ -39,11 +39,6 @@ window.KGM_CONTENT_EN = {
       suv: "SUV",
       pickup: "Pickup",
     },
-  },
-  gallery: {
-    eyebrow: "The Gallery",
-    heading: "KGM is really here",
-    sub: "A first look — full brand and lifestyle imagery to follow as it is approved.",
   },
   showrooms: {
     eyebrow: "Showrooms",
