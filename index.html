@@ -1,241 +1,493 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" dir="ltr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>KGM — Arriving in the UAE</title>
-<meta name="description" content="CONTENT REQUIRED — approved SEO meta description pending.">
-<meta name="robots" content="noindex, nofollow"><!-- build-stage demo; remove once domain/content are live -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>KGM — Arriving in the UAE</title>
+    <meta
+      name="description"
+      content="CONTENT REQUIRED — approved SEO meta description pending."
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <!-- build-stage demo; remove once domain/content are live -->
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="icon" href="assets/meta/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="icon" href="assets/meta/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="css/styles.css" />
 
-<meta property="og:title" content="KGM — Arriving in the UAE">
-<meta property="og:description" content="CONTENT REQUIRED">
-<meta property="og:type" content="website">
-</head>
-<body>
+    <meta property="og:title" content="KGM — Arriving in the UAE" />
+    <meta property="og:description" content="CONTENT REQUIRED" />
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+    <a href="#main" class="skip-link" data-i18n="nav.skipLink"
+      >Skip to content</a
+    >
 
-<a href="#main" class="skip-link" data-i18n="nav.skipLink">Skip to content</a>
+    <!-- ============ PERSISTENT LAYER — header ============ -->
+    <header class="site-header" id="site-header">
+      <div class="container site-header__inner">
+        <a href="#hero" class="brand keep-ltr">KGM</a>
 
-<!-- ============ PERSISTENT LAYER — header ============ -->
-<header class="site-header" id="site-header">
-  <div class="container site-header__inner">
-    <a href="#hero" class="brand keep-ltr">KGM</a>
+        <nav class="primary-nav" aria-label="Primary">
+          <a href="#models" data-i18n="nav.models">The Models</a>
+          <a href="#gallery" data-i18n="nav.gallery">Gallery</a>
+          <a href="#showrooms" data-i18n="nav.showrooms">Showrooms</a>
+          <a href="#register" data-i18n="nav.register">Register Interest</a>
+        </nav>
 
-    <nav class="primary-nav" aria-label="Primary">
+        <div class="header-actions">
+          <div class="lang-switch" role="group" aria-label="Language">
+            <button type="button" data-lang-btn="en" aria-pressed="true">
+              EN
+            </button>
+            <button type="button" data-lang-btn="ar" aria-pressed="false">
+              AR
+            </button>
+          </div>
+          <a
+            href="#register"
+            class="btn btn--primary btn--sm"
+            data-register-cta="nav"
+            data-i18n="nav.register"
+            >Register Interest</a
+          >
+          <button
+            type="button"
+            class="nav-toggle"
+            id="nav-toggle"
+            aria-expanded="false"
+            aria-controls="mobile-nav"
+            aria-label="Menu"
+          >
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile">
       <a href="#models" data-i18n="nav.models">The Models</a>
       <a href="#gallery" data-i18n="nav.gallery">Gallery</a>
       <a href="#showrooms" data-i18n="nav.showrooms">Showrooms</a>
       <a href="#register" data-i18n="nav.register">Register Interest</a>
     </nav>
 
-    <div class="header-actions">
-      <div class="lang-switch" role="group" aria-label="Language">
-        <button type="button" data-lang-btn="en" aria-pressed="true">EN</button>
-        <button type="button" data-lang-btn="ar" aria-pressed="false">AR</button>
-      </div>
-      <a href="#register" class="btn btn--primary btn--sm" data-register-cta="nav" data-i18n="nav.register">Register Interest</a>
-      <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="mobile-nav" aria-label="Menu">
-        <span></span>
-      </button>
+    <!-- Journey thread — desktop-only progress through ARRIVE → EXPLORE → TRUST → REGISTER -->
+    <div class="journey-thread" aria-hidden="true">
+      <span class="journey-thread__line"></span>
+      <span class="journey-thread__stage">ARRIVE</span>
+      <span class="journey-thread__stage">EXPLORE</span>
+      <span class="journey-thread__stage">TRUST</span>
+      <span class="journey-thread__stage">TRUST</span>
+      <span class="journey-thread__stage">REGISTER</span>
+      <span class="journey-thread__line"></span>
     </div>
-  </div>
-</header>
 
-<nav id="mobile-nav" class="mobile-nav" aria-label="Mobile">
-  <a href="#models" data-i18n="nav.models">The Models</a>
-  <a href="#gallery" data-i18n="nav.gallery">Gallery</a>
-  <a href="#showrooms" data-i18n="nav.showrooms">Showrooms</a>
-  <a href="#register" data-i18n="nav.register">Register Interest</a>
-</nav>
-
-<!-- Journey thread — desktop-only progress through ARRIVE → EXPLORE → TRUST → REGISTER -->
-<div class="journey-thread" aria-hidden="true">
-  <span class="journey-thread__line"></span>
-  <span class="journey-thread__stage">ARRIVE</span>
-  <span class="journey-thread__stage">EXPLORE</span>
-  <span class="journey-thread__stage">TRUST</span>
-  <span class="journey-thread__stage">TRUST</span>
-  <span class="journey-thread__stage">REGISTER</span>
-  <span class="journey-thread__line"></span>
-</div>
-
-<main id="main">
-
-  <!-- ============ 1. HERO — ARRIVE ============ -->
-  <section id="hero" class="hero">
-    <div class="hero__media" aria-hidden="true">
-      <video id="hero-video" autoplay muted loop playsinline poster="assets/video/hero-poster.jpg">
-        <source src="assets/video/hero.mp4" type="video/mp4">
-      </video>
-    </div>
-    <div class="hero__scrim" aria-hidden="true"></div>
-    <div class="hero__content container">
-      <p class="eyebrow hero__eyebrow" data-i18n="hero.eyebrow">KGM UAE — Arriving August 2026</p>
-      <h1 class="h1 hero__headline" data-i18n="hero.headline">KGM has arrived in the UAE</h1>
-      <p class="hero__sub" data-i18n="hero.sub">A new journey begins.</p>
-      <div class="hero__actions">
-        <a href="#register" class="btn btn--primary" data-register-cta="hero" data-i18n="hero.cta">Register Interest</a>
-        <a href="#models" class="btn btn--ghost" data-i18n="hero.secondaryCta">Explore the range</a>
-      </div>
-    </div>
-    <div class="hero__scroll-cue" aria-hidden="true">
-      <span data-i18n="hero.scrollCue">Scroll</span>
-      <span class="hero__scroll-cue-line"></span>
-    </div>
-  </section>
-
-  <!-- ============ 2. THE MODELS — EXPLORE ============ -->
-  <section id="models" class="scene scene--dark models">
-    <div class="container">
-      <div class="scene-head reveal">
-        <p class="eyebrow" data-i18n="models.eyebrow">The Lineup</p>
-        <h2 class="h2" data-i18n="models.heading">Explore the range</h2>
-        <p class="lead" data-i18n="models.sub">Names, hero shots and key numbers only.</p>
-      </div>
-
-      <div class="model-carousel reveal">
-        <div class="model-track" id="model-track" tabindex="0" aria-label="KGM UAE model lineup" aria-roledescription="carousel"></div>
-
-        <div class="carousel-controls">
-          <div class="carousel-arrows">
-            <button type="button" class="carousel-arrow" id="model-prev" data-i18n-aria-label="models.prev" aria-label="Previous model">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="icon-flip"><path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <button type="button" class="carousel-arrow" id="model-next" data-i18n-aria-label="models.next" aria-label="Next model">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="icon-flip"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
+    <main id="main">
+      <!-- ============ 1. HERO — ARRIVE ============ -->
+      <section id="hero" class="hero">
+        <div class="hero__media" aria-hidden="true">
+          <video
+            id="hero-video"
+            autoplay
+            muted
+            loop
+            playsinline
+            poster="assets/hero/hero-poster.jpg"
+          >
+            <source src="assets/hero/hero.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div class="hero__scrim" aria-hidden="true"></div>
+        <div class="hero__content container">
+          <p class="eyebrow hero__eyebrow" data-i18n="hero.eyebrow">
+            KGM UAE — Arriving August 2026
+          </p>
+          <h1 class="h1 hero__headline" data-i18n="hero.headline">
+            KGM has arrived in the UAE
+          </h1>
+          <p class="hero__sub" data-i18n="hero.sub">A new journey begins.</p>
+          <div class="hero__actions">
+            <a
+              href="#register"
+              class="btn btn--primary"
+              data-register-cta="hero"
+              data-i18n="hero.cta"
+              >Register Interest</a
+            >
+            <a
+              href="#models"
+              class="btn btn--ghost"
+              data-i18n="hero.secondaryCta"
+              >Explore the range</a
+            >
           </div>
-          <div class="carousel-dots" id="carousel-dots" role="tablist" aria-label="Model slides"></div>
         </div>
+        <div class="hero__scroll-cue" aria-hidden="true">
+          <span data-i18n="hero.scrollCue">Scroll</span>
+          <span class="hero__scroll-cue-line"></span>
+        </div>
+      </section>
+
+      <!-- ============ 2. THE MODELS — EXPLORE ============ -->
+      <section id="models" class="scene scene--dark models">
+        <div class="container">
+          <div class="scene-head reveal">
+            <p class="eyebrow" data-i18n="models.eyebrow">The Lineup</p>
+            <h2 class="h2" data-i18n="models.heading">Explore the range</h2>
+            <p class="lead" data-i18n="models.sub">
+              Names, hero shots and key numbers only.
+            </p>
+          </div>
+
+          <div class="model-carousel reveal">
+            <div
+              class="model-track"
+              id="model-track"
+              tabindex="0"
+              aria-label="KGM UAE model lineup"
+              aria-roledescription="carousel"
+            ></div>
+
+            <div class="carousel-controls">
+              <div class="carousel-arrows">
+                <button
+                  type="button"
+                  class="carousel-arrow"
+                  id="model-prev"
+                  data-i18n-aria-label="models.prev"
+                  aria-label="Previous model"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    class="icon-flip"
+                  >
+                    <path
+                      d="M15 6L9 12L15 18"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="carousel-arrow"
+                  id="model-next"
+                  data-i18n-aria-label="models.next"
+                  aria-label="Next model"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    class="icon-flip"
+                  >
+                    <path
+                      d="M9 6L15 12L9 18"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <div
+                class="carousel-dots"
+                id="carousel-dots"
+                role="tablist"
+                aria-label="Model slides"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 3. GALLERY — TRUST ============ -->
+      <section id="gallery" class="scene scene--dark gallery">
+        <div class="container">
+          <div class="scene-head reveal">
+            <p class="eyebrow" data-i18n="gallery.eyebrow">The Gallery</p>
+            <h2 class="h2" data-i18n="gallery.heading">KGM is really here</h2>
+            <p class="lead" data-i18n="gallery.sub">A first look.</p>
+          </div>
+          <div class="gallery-grid reveal" id="gallery-grid"></div>
+        </div>
+      </section>
+
+      <!-- ============ 4. SHOWROOMS — TRUST ============ -->
+      <section id="showrooms" class="scene scene--stone showrooms">
+        <div class="container">
+          <div class="scene-head reveal on-stone">
+            <p class="eyebrow" data-i18n="showrooms.eyebrow">Showrooms</p>
+            <h2 class="h2" data-i18n="showrooms.heading">
+              Just a few minutes away
+            </h2>
+            <p class="lead" data-i18n="showrooms.sub">
+              Showroom locations, hours and directions.
+            </p>
+          </div>
+          <div class="showroom-grid reveal" id="showroom-grid"></div>
+        </div>
+      </section>
+
+      <!-- ============ 5. REGISTER INTEREST — REGISTER ============ -->
+      <section id="register" class="scene scene--stone register">
+        <div class="container container--narrow">
+          <div class="scene-head reveal on-stone">
+            <p class="eyebrow" data-i18n="register.eyebrow">
+              Register Interest
+            </p>
+            <h2 class="h2" data-i18n="register.heading">
+              From interest to inbox in seconds
+            </h2>
+            <p class="lead" data-i18n="register.sub">
+              Share a few details and our sales team will be in touch.
+            </p>
+          </div>
+
+          <form class="form-panel reveal" id="register-form" novalidate>
+            <div class="form-honeypot" aria-hidden="true">
+              <label for="company_website">Company website</label>
+              <input
+                type="text"
+                id="company_website"
+                name="company_website"
+                tabindex="-1"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="field" data-field="name">
+              <label for="field-name" data-i18n="register.fields.name"
+                >Full name</label
+              >
+              <input
+                type="text"
+                id="field-name"
+                name="name"
+                autocomplete="name"
+                data-i18n-placeholder="register.fields.namePlaceholder"
+                required
+              />
+              <span
+                class="field__error"
+                data-error-for="name"
+                aria-live="polite"
+              ></span>
+            </div>
+
+            <div class="field" data-field="phone">
+              <label for="field-phone" data-i18n="register.fields.phone"
+                >Phone number</label
+              >
+              <input
+                type="tel"
+                id="field-phone"
+                name="phone"
+                inputmode="tel"
+                autocomplete="tel"
+                data-i18n-placeholder="register.fields.phonePlaceholder"
+                required
+              />
+              <span
+                class="field__error"
+                data-error-for="phone"
+                aria-live="polite"
+              ></span>
+            </div>
+
+            <div class="field" data-field="emirate">
+              <label for="field-emirate" data-i18n="register.fields.emirate"
+                >Emirate</label
+              >
+              <select id="field-emirate" name="emirate" required>
+                <option value="" data-i18n="register.fields.emiratePlaceholder">
+                  Select your emirate
+                </option>
+                <option value="abu-dhabi" data-i18n="emirates.0">
+                  Abu Dhabi
+                </option>
+                <option value="dubai" data-i18n="emirates.1">Dubai</option>
+                <option value="sharjah" data-i18n="emirates.2">Sharjah</option>
+                <option value="ajman" data-i18n="emirates.3">Ajman</option>
+                <option value="umm-al-quwain" data-i18n="emirates.4">
+                  Umm Al Quwain
+                </option>
+                <option value="ras-al-khaimah" data-i18n="emirates.5">
+                  Ras Al Khaimah
+                </option>
+                <option value="fujairah" data-i18n="emirates.6">
+                  Fujairah
+                </option>
+              </select>
+              <span
+                class="field__error"
+                data-error-for="emirate"
+                aria-live="polite"
+              ></span>
+            </div>
+
+            <div class="field" data-field="model">
+              <label for="field-model" data-i18n="register.fields.model"
+                >Model of interest</label
+              >
+              <select id="field-model" name="model" required>
+                <option value="" data-i18n="register.fields.modelPlaceholder">
+                  Select a model
+                </option>
+              </select>
+              <span
+                class="field__error"
+                data-error-for="model"
+                aria-live="polite"
+              ></span>
+            </div>
+
+            <div class="field field--checkbox" data-field="consent">
+              <input type="checkbox" id="field-consent" name="consent" />
+              <label for="field-consent" data-i18n="register.fields.consent"
+                >I agree to the processing of my personal data.</label
+              >
+            </div>
+            <span
+              class="field__error"
+              data-error-for="consent"
+              aria-live="polite"
+              style="display: block; margin-top: -0.75rem; margin-bottom: 1rem"
+            ></span>
+
+            <button
+              type="submit"
+              class="btn btn--primary btn--block"
+              data-i18n="register.submit"
+            >
+              Register interest
+            </button>
+            <div
+              class="form-status"
+              id="form-status"
+              role="status"
+              aria-live="polite"
+            ></div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <!-- ============ PERSISTENT LAYER — WhatsApp + mobile Register FAB ============ -->
+    <div class="persistent-actions">
+      <a
+        href="#"
+        class="fab fab--whatsapp"
+        data-whatsapp-trigger="floating"
+        data-i18n-aria-label="whatsapp.label"
+        aria-label="Chat on WhatsApp"
+        target="_blank"
+        rel="noopener"
+      >
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.2h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm5.8 14.1c-.24.68-1.4 1.3-1.93 1.37-.5.08-1.12.11-1.8-.11-.42-.13-.96-.3-1.65-.6-2.9-1.25-4.8-4.17-4.94-4.36-.14-.2-1.18-1.57-1.18-3 0-1.42.75-2.12 1.02-2.41.26-.29.58-.36.77-.36h.55c.18 0 .42-.07.66.5.24.58.82 2 .9 2.14.07.15.12.32.02.52-.1.2-.15.32-.3.5-.14.17-.3.38-.44.51-.14.14-.3.3-.13.6.18.29.79 1.3 1.7 2.1 1.17 1.04 2.15 1.37 2.45 1.52.3.15.47.13.65-.08.18-.2.76-.88.96-1.18.2-.3.4-.25.66-.15.27.1 1.7.8 1.99.95.29.14.48.21.55.33.07.12.07.68-.17 1.36Z"
+          />
+        </svg>
+      </a>
+      <a
+        href="#register"
+        class="fab fab--register btn btn--primary"
+        data-register-cta="floating"
+        aria-label="Register Interest"
+        style="border-radius: 50%"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M12 5v14M5 12h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </a>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <!-- ============ PERSISTENT LAYER — PDPL consent banner ============ -->
+    <div
+      class="consent-banner"
+      id="consent-banner"
+      role="region"
+      aria-label="Cookie & privacy consent"
+    >
+      <p data-i18n="consentBanner.text">
+        We use essential cookies to run this site.
+      </p>
+      <div class="consent-banner__actions">
+        <button
+          type="button"
+          class="btn btn--ghost btn--sm"
+          id="consent-decline"
+          data-i18n="consentBanner.decline"
+        >
+          Decline
+        </button>
+        <button
+          type="button"
+          class="btn btn--primary btn--sm"
+          id="consent-accept"
+          data-i18n="consentBanner.accept"
+        >
+          Accept
+        </button>
       </div>
     </div>
-  </section>
 
-  <!-- ============ 3. GALLERY — TRUST ============ -->
-  <section id="gallery" class="scene scene--dark gallery">
-    <div class="container">
-      <div class="scene-head reveal">
-        <p class="eyebrow" data-i18n="gallery.eyebrow">The Gallery</p>
-        <h2 class="h2" data-i18n="gallery.heading">KGM is really here</h2>
-        <p class="lead" data-i18n="gallery.sub">A first look.</p>
+    <footer class="site-footer">
+      <div class="container site-footer__inner">
+        <p class="site-footer__legal" data-i18n="footer.legal">
+          © 2026 KGM UAE. All rights reserved.
+        </p>
+        <div class="site-footer__links">
+          <a href="#" data-i18n="footer.privacy">Privacy &amp; PDPL</a>
+        </div>
       </div>
-      <div class="gallery-grid reveal" id="gallery-grid"></div>
-    </div>
-  </section>
-
-  <!-- ============ 4. SHOWROOMS — TRUST ============ -->
-  <section id="showrooms" class="scene scene--stone showrooms">
-    <div class="container">
-      <div class="scene-head reveal on-stone">
-        <p class="eyebrow" data-i18n="showrooms.eyebrow">Showrooms</p>
-        <h2 class="h2" data-i18n="showrooms.heading">Just a few minutes away</h2>
-        <p class="lead" data-i18n="showrooms.sub">Showroom locations, hours and directions.</p>
+      <div class="container">
+        <p
+          class="site-footer__legal"
+          style="margin-top: 1rem; max-width: 70ch; opacity: 0.7"
+          data-i18n="footer.contentRequiredNote"
+        ></p>
       </div>
-      <div class="showroom-grid reveal" id="showroom-grid"></div>
-    </div>
-  </section>
+    </footer>
 
-  <!-- ============ 5. REGISTER INTEREST — REGISTER ============ -->
-  <section id="register" class="scene scene--stone register">
-    <div class="container container--narrow">
-      <div class="scene-head reveal on-stone">
-        <p class="eyebrow" data-i18n="register.eyebrow">Register Interest</p>
-        <h2 class="h2" data-i18n="register.heading">From interest to inbox in seconds</h2>
-        <p class="lead" data-i18n="register.sub">Share a few details and our sales team will be in touch.</p>
-      </div>
-
-      <form class="form-panel reveal" id="register-form" novalidate>
-        <div class="form-honeypot" aria-hidden="true">
-          <label for="company_website">Company website</label>
-          <input type="text" id="company_website" name="company_website" tabindex="-1" autocomplete="off">
-        </div>
-
-        <div class="field" data-field="name">
-          <label for="field-name" data-i18n="register.fields.name">Full name</label>
-          <input type="text" id="field-name" name="name" autocomplete="name" data-i18n-placeholder="register.fields.namePlaceholder" required>
-          <span class="field__error" data-error-for="name" aria-live="polite"></span>
-        </div>
-
-        <div class="field" data-field="phone">
-          <label for="field-phone" data-i18n="register.fields.phone">Phone number</label>
-          <input type="tel" id="field-phone" name="phone" inputmode="tel" autocomplete="tel" data-i18n-placeholder="register.fields.phonePlaceholder" required>
-          <span class="field__error" data-error-for="phone" aria-live="polite"></span>
-        </div>
-
-        <div class="field" data-field="emirate">
-          <label for="field-emirate" data-i18n="register.fields.emirate">Emirate</label>
-          <select id="field-emirate" name="emirate" required>
-            <option value="" data-i18n="register.fields.emiratePlaceholder">Select your emirate</option>
-            <option value="abu-dhabi" data-i18n="emirates.0">Abu Dhabi</option>
-            <option value="dubai" data-i18n="emirates.1">Dubai</option>
-            <option value="sharjah" data-i18n="emirates.2">Sharjah</option>
-            <option value="ajman" data-i18n="emirates.3">Ajman</option>
-            <option value="umm-al-quwain" data-i18n="emirates.4">Umm Al Quwain</option>
-            <option value="ras-al-khaimah" data-i18n="emirates.5">Ras Al Khaimah</option>
-            <option value="fujairah" data-i18n="emirates.6">Fujairah</option>
-          </select>
-          <span class="field__error" data-error-for="emirate" aria-live="polite"></span>
-        </div>
-
-        <div class="field" data-field="model">
-          <label for="field-model" data-i18n="register.fields.model">Model of interest</label>
-          <select id="field-model" name="model" required>
-            <option value="" data-i18n="register.fields.modelPlaceholder">Select a model</option>
-          </select>
-          <span class="field__error" data-error-for="model" aria-live="polite"></span>
-        </div>
-
-        <div class="field field--checkbox" data-field="consent">
-          <input type="checkbox" id="field-consent" name="consent">
-          <label for="field-consent" data-i18n="register.fields.consent">I agree to the processing of my personal data.</label>
-        </div>
-        <span class="field__error" data-error-for="consent" aria-live="polite" style="display:block;margin-top:-0.75rem;margin-bottom:1rem;"></span>
-
-        <button type="submit" class="btn btn--primary btn--block" data-i18n="register.submit">Register interest</button>
-        <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
-      </form>
-    </div>
-  </section>
-
-</main>
-
-<!-- ============ PERSISTENT LAYER — WhatsApp + mobile Register FAB ============ -->
-<div class="persistent-actions">
-  <a href="#" class="fab fab--whatsapp" data-whatsapp-trigger="floating" data-i18n-aria-label="whatsapp.label" aria-label="Chat on WhatsApp" target="_blank" rel="noopener">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.2h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm5.8 14.1c-.24.68-1.4 1.3-1.93 1.37-.5.08-1.12.11-1.8-.11-.42-.13-.96-.3-1.65-.6-2.9-1.25-4.8-4.17-4.94-4.36-.14-.2-1.18-1.57-1.18-3 0-1.42.75-2.12 1.02-2.41.26-.29.58-.36.77-.36h.55c.18 0 .42-.07.66.5.24.58.82 2 .9 2.14.07.15.12.32.02.52-.1.2-.15.32-.3.5-.14.17-.3.38-.44.51-.14.14-.3.3-.13.6.18.29.79 1.3 1.7 2.1 1.17 1.04 2.15 1.37 2.45 1.52.3.15.47.13.65-.08.18-.2.76-.88.96-1.18.2-.3.4-.25.66-.15.27.1 1.7.8 1.99.95.29.14.48.21.55.33.07.12.07.68-.17 1.36Z"/></svg>
-  </a>
-  <a href="#register" class="fab fab--register btn btn--primary" data-register-cta="floating" aria-label="Register Interest" style="border-radius:50%;">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-  </a>
-</div>
-
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-<!-- ============ PERSISTENT LAYER — PDPL consent banner ============ -->
-<div class="consent-banner" id="consent-banner" role="region" aria-label="Cookie & privacy consent">
-  <p data-i18n="consentBanner.text">We use essential cookies to run this site.</p>
-  <div class="consent-banner__actions">
-    <button type="button" class="btn btn--ghost btn--sm" id="consent-decline" data-i18n="consentBanner.decline">Decline</button>
-    <button type="button" class="btn btn--primary btn--sm" id="consent-accept" data-i18n="consentBanner.accept">Accept</button>
-  </div>
-</div>
-
-<footer class="site-footer">
-  <div class="container site-footer__inner">
-    <p class="site-footer__legal" data-i18n="footer.legal">© 2026 KGM UAE. All rights reserved.</p>
-    <div class="site-footer__links">
-      <a href="#" data-i18n="footer.privacy">Privacy &amp; PDPL</a>
-    </div>
-  </div>
-  <div class="container">
-    <p class="site-footer__legal" style="margin-top:1rem;max-width:70ch;opacity:0.7;" data-i18n="footer.contentRequiredNote"></p>
-  </div>
-</footer>
-
-<script type="module" src="js/main.js"></script>
-</body>
+    <!-- Plain classic scripts (no type="module", no fetch) — loads correctly
+     whether opened via a server or double-clicked directly as a file. -->
+    <script src="data/content.en.js"></script>
+    <script src="data/content.ar.js"></script>
+    <script src="data/models.js"></script>
+    <script src="data/gallery.js"></script>
+    <script src="data/showrooms.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/consent.js"></script>
+    <script src="js/whatsapp.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/form.js"></script>
+    <script src="js/models.js"></script>
+    <script src="js/gallery.js"></script>
+    <script src="js/showrooms.js"></script>
+    <script src="js/main.js"></script>
+  </body>
 </html>

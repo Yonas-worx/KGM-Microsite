@@ -1,0 +1,98 @@
+// Auto-converted from content.en.json so it loads via plain <script> (works under file:// with no server).
+window.KGM_CONTENT_EN = {
+  "_meta": {
+    "status": "DRAFT — placeholder copy for build/demo purposes only. Not approved brand copy. See project-brief.md §13 item 16.",
+    "language": "en"
+  },
+  "meta": {
+    "title": "KGM — Arriving in the UAE",
+    "description": "CONTENT REQUIRED — approved SEO meta description pending."
+  },
+  "nav": {
+    "models": "The Models",
+    "gallery": "Gallery",
+    "showrooms": "Showrooms",
+    "register": "Register Interest",
+    "skipLink": "Skip to content"
+  },
+  "langSwitch": { "en": "EN", "ar": "AR" },
+  "hero": {
+    "eyebrow": "KGM UAE — Arriving August 2026",
+    "headline": "KGM has arrived in the UAE",
+    "sub": "A new journey begins. Draft headline — approved hero copy pending (project-brief.md §13 item 16).",
+    "cta": "Register Interest",
+    "secondaryCta": "Explore the range",
+    "scrollCue": "Scroll"
+  },
+  "models": {
+    "eyebrow": "The Lineup",
+    "heading": "Explore the range",
+    "sub": "Names, hero shots and key numbers only — swipe or use the arrows to move through the confirmed KGM UAE lineup.",
+    "contentRequired": "Spec pending",
+    "cta": "Register interest",
+    "prev": "Previous model",
+    "next": "Next model"
+  },
+  "gallery": {
+    "eyebrow": "The Gallery",
+    "heading": "KGM is really here",
+    "sub": "A first look — full brand and lifestyle imagery to follow as it is approved."
+  },
+  "showrooms": {
+    "eyebrow": "Showrooms",
+    "heading": "Just a few minutes away",
+    "sub": "Showroom locations, hours and directions will appear here once confirmed by the project owner.",
+    "directions": "Get directions",
+    "call": "Call showroom",
+    "mapPlaceholder": "Map pending — address & coordinates required",
+    "hoursLabel": "Hours",
+    "addressLabel": "Address"
+  },
+  "register": {
+    "eyebrow": "Register Interest",
+    "heading": "From interest to inbox in seconds",
+    "sub": "Share a few details and our sales team will be in touch. Available in English and Arabic.",
+    "fields": {
+      "name": "Full name",
+      "namePlaceholder": "Your name",
+      "phone": "Phone number",
+      "phonePlaceholder": "05X XXX XXXX",
+      "emirate": "Emirate",
+      "emiratePlaceholder": "Select your emirate",
+      "model": "Model of interest",
+      "modelPlaceholder": "Select a model",
+      "consent": "I agree to the processing of my personal data in line with the Privacy & PDPL Notice. CONTENT REQUIRED — final consent wording pending."
+    },
+    "errors": {
+      "name": "Please enter your name.",
+      "phone": "Please enter a valid phone number.",
+      "emirate": "Please select your emirate.",
+      "model": "Please select a model.",
+      "consent": "Consent is required to submit this form."
+    },
+    "submit": "Register interest",
+    "submitting": "Submitting…",
+    "success": "Thank you. Your interest has been registered — our sales team will contact you shortly.",
+    "error": "Something went wrong. Please try again, or reach us on WhatsApp.",
+    "endpointNotice": "Draft build: no submission endpoint is connected yet (CONTENT REQUIRED — project-brief.md §13 item 8)."
+  },
+  "emirates": [
+    "Abu Dhabi", "Dubai", "Sharjah", "Ajman", "Umm Al Quwain", "Ras Al Khaimah", "Fujairah"
+  ],
+  "whatsapp": {
+    "label": "Chat on WhatsApp",
+    "defaultMessage": "CONTENT REQUIRED",
+    "toastPending": "WhatsApp number pending — coming soon."
+  },
+  "consentBanner": {
+    "text": "We use essential cookies to run this site, and — only with your consent — analytics to understand how it's used. PDPL wording CONTENT REQUIRED.",
+    "accept": "Accept",
+    "decline": "Decline"
+  },
+  "footer": {
+    "legal": "\u00a9 2026 KGM UAE. All rights reserved. Legal & privacy copy CONTENT REQUIRED.",
+    "privacy": "Privacy & PDPL",
+    "contentRequiredNote": "This is a build-stage demonstration. Vehicle imagery shown is official KGM product photography; specifications, showroom details, and legal copy are placeholders pending approved project content."
+  },
+  "contentRequiredBadge": "Content required"
+};

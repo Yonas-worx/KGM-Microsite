@@ -2,8 +2,9 @@
 // Every value below that is a real-world business fact is CONTENT REQUIRED
 // and intentionally left null/empty. Nothing here is invented.
 // Swap these in once the project owner supplies them — no other code changes needed.
+window.KGM = window.KGM || {};
 
-export const CONFIG = {
+window.KGM.CONFIG = {
   // CONTENT REQUIRED — brief §13 item 10
   WHATSAPP_NUMBER_E164: null, // e.g. "+9715XXXXXXXX"
 
