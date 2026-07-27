@@ -17,6 +17,7 @@ window.KGM = window.KGM || {};
   let previousTime = null;
   let autoplayPaused = false;
   let resumeTimer = null;
+  let manualAnimating = false;
 
   let dragging = false;
   let pointerStartX = 0;
@@ -40,8 +41,12 @@ window.KGM = window.KGM || {};
   }
 
   function getModelType(model) {
-    const category = String(model.category || "").toLowerCase();
-    return category.includes("pickup") ? "pickup" : "suv";
+    const name = String(model.name || model.id || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+
+    return name.includes("musso") ? "pickup" : "suv";
   }
 
   function renderSlide(model, index) {
@@ -145,6 +150,7 @@ window.KGM = window.KGM || {};
 
     if (
       !autoplayPaused &&
+      !manualAnimating &&
       !dragging &&
       !reduceMotion() &&
       visibleModels.length > 1
@@ -177,15 +183,34 @@ window.KGM = window.KGM || {};
   }
 
   function moveByCard(direction) {
-    if (!trackEl || visibleModels.length < 2) return;
+    if (
+      !trackEl ||
+      visibleModels.length < 2 ||
+      manualAnimating
+    ) {
+      return;
+    }
 
     pauseAutoplay();
+    manualAnimating = true;
+
+    const duration = reduceMotion() ? 0 : 420;
+
+    // Moving left: place the last card before the first card before animating.
+    if (direction < 0) {
+      const lastCard = trackEl.lastElementChild;
+
+      if (lastCard) {
+        trackEl.insertBefore(lastCard, trackEl.firstElementChild);
+        offset += cardWidth(lastCard);
+        applyTransform();
+      }
+    }
 
     const firstCard = trackEl.firstElementChild;
     const distance = cardWidth(firstCard);
     const start = offset;
-    const target = start + distance * direction;
-    const duration = reduceMotion() ? 0 : 420;
+    const target = direction > 0 ? start + distance : start - distance;
     const startedAt = performance.now();
 
     function step(now) {
@@ -194,13 +219,28 @@ window.KGM = window.KGM || {};
       const eased = 1 - Math.pow(1 - progress, 3);
 
       offset = start + (target - start) * eased;
-      normalizePosition();
+      applyTransform();
 
       if (progress < 1) {
         requestAnimationFrame(step);
-      } else {
-        resumeAutoplay(RESUME_DELAY);
+        return;
       }
+
+      // Recycle only after the movement finishes, preventing visible glitches.
+      if (direction > 0) {
+        const movedCard = trackEl.firstElementChild;
+        if (movedCard) {
+          offset -= cardWidth(movedCard);
+          trackEl.appendChild(movedCard);
+        }
+      }
+
+      offset = Math.max(0, offset);
+      applyTransform();
+
+      manualAnimating = false;
+      previousTime = null;
+      resumeAutoplay(RESUME_DELAY);
     }
 
     requestAnimationFrame(step);

@@ -29,7 +29,7 @@ window.KGM_CONTENT_EN = {
   },
   models: {
     eyebrow: "KGM Lineup",
-    heading: "",
+    heading: "Built for every road ahead.",
     sub: "",
     contentRequired: "Spec pending",
     cta: "Register interest",
