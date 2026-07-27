@@ -148,7 +148,21 @@ window.KGM = window.KGM || {};
 
   function prefillModel(modelId) {
     const select = document.querySelector('#register-form select[name="model"]');
-    if (select) select.value = modelId;
+    if (!select || !modelId) return false;
+
+    const value = String(modelId);
+    const hasOption = [...select.options].some((option) => option.value === value);
+    if (!hasOption) return false;
+
+    select.value = value;
+    select.dispatchEvent(new Event('input', { bubbles: true }));
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+
+    const fieldEl = select.closest('[data-field="model"]');
+    const errorEl = document.querySelector('#register-form [data-error-for="model"]');
+    if (fieldEl) setFieldError(fieldEl, errorEl, '');
+
+    return select.value === value;
   }
 
   window.KGM.form = { initForm, prefillModel };

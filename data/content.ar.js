@@ -1,4 +1,4 @@
-// Auto-converted from content.ar.json for plain-script loading.
+// Auto-converted from content.ar.json so it loads via plain <script> (works under file:// with no server).
 window.KGM_CONTENT_AR = {
   "_meta": {
     "status": "DRAFT — working Arabic copy for build/demo purposes only. NOT a professional human translation. Must be replaced by approved localisation before launch (project-brief.md §13 item 17).",
@@ -9,15 +9,13 @@ window.KGM_CONTENT_AR = {
     "description": "مطلوب محتوى معتمد — وصف تعريفي (SEO) نهائي قيد الانتظار."
   },
   "nav": {
-    "models": "تشكيلة KGM",
+    "models": "الطرازات",
+    "gallery": "معرض الصور",
     "showrooms": "صالات العرض",
     "register": "سجّل اهتمامك",
     "skipLink": "الانتقال إلى المحتوى"
   },
-  "langSwitch": {
-    "en": "EN",
-    "ar": "AR"
-  },
+  "langSwitch": { "en": "EN", "ar": "AR" },
   "hero": {
     "eyebrow": "كي جي إم الإمارات — الوصول أغسطس 2026",
     "headline": "كي جي إم وصلت إلى الإمارات",
@@ -27,14 +25,16 @@ window.KGM_CONTENT_AR = {
     "scrollCue": "مرر للأسفل"
   },
   "models": {
-    "eyebrow": "تشكيلة KGM",
-    "heading": "تعرّف على التشكيلة الكاملة",
-    "sub": "استكشف مجموعة KGM. مرّر فوق أي طراز لإلقاء نظرة أقرب.",
+    "eyebrow": "التشكيلة",
+    "heading": "مصممة لكل طريق أمامك.",
+    "sub": "",
+    "contentRequired": "المواصفات قيد الانتظار",
     "cta": "سجّل اهتمامك",
-    "prev": "الطرازات السابقة",
-    "next": "الطرازات التالية",
+    "prev": "الطراز السابق",
+    "next": "الطراز التالي",
     "filters": {
-      "suv": "SUV",
+      "all": "الكل",
+      "suv": "دفع رباعي",
       "pickup": "بيك أب"
     }
   },
@@ -82,13 +82,7 @@ window.KGM_CONTENT_AR = {
     "endpointNotice": "نسخة تجريبية: لم يتم ربط جهة استلام الطلبات بعد (محتوى مطلوب)."
   },
   "emirates": [
-    "أبوظبي",
-    "دبي",
-    "الشارقة",
-    "عجمان",
-    "أم القيوين",
-    "رأس الخيمة",
-    "الفجيرة"
+    "أبوظبي", "دبي", "الشارقة", "عجمان", "أم القيوين", "رأس الخيمة", "الفجيرة"
   ],
   "whatsapp": {
     "label": "تواصل عبر واتساب",
@@ -105,25 +99,5 @@ window.KGM_CONTENT_AR = {
     "privacy": "الخصوصية و PDPL",
     "contentRequiredNote": "هذا عرض تجريبي في مرحلة البناء. صور المركبات المعروضة هي صور منتج رسمية من كي جي إم؛ أما المواصفات وتفاصيل صالات العرض والنصوص القانونية فهي عناصر نائبة بانتظار المحتوى المعتمد."
   },
-  "contentRequiredBadge": "محتوى مطلوب",
-  "campaign": {
-    "eyebrow": "اختيارك القادم من KGM",
-    "heading": "مصممة لما هو قادم",
-    "sub": "ثلاثة تعبيرات مختلفة عن الثقة والقدرة والحركة.",
-    "torres": {
-      "name": "توريس",
-      "line1": "مغامرة",
-      "line2": "غير متوقعة"
-    },
-    "mussoEv": {
-      "name": "موسو EV",
-      "line1": "أدوات جديدة.",
-      "line2": "حياة جديدة."
-    },
-    "actyon": {
-      "name": "أكتيون",
-      "line1": "جاهز.",
-      "line2": "انطلاق. أكتيون."
-    }
-  }
+  "contentRequiredBadge": "محتوى مطلوب"
 };
