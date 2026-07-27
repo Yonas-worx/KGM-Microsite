@@ -1,4 +1,4 @@
-// models.js — smooth filtered lineup rail with hover expansion and manual navigation only.
+// models.js — smooth filtered lineup rail with continuous autoplay.
 window.KGM = window.KGM || {};
 
 (function () {
@@ -6,51 +6,89 @@ window.KGM = window.KGM || {};
   let visibleModels = [];
   let activeFilter = "suv";
   let trackEl = null;
+  let animationFrame = null;
+  let previousTime = null;
   let scrollTimer = null;
+  let autoplayPaused = false;
+
+  const AUTOPLAY_SPEED = 24;
 
   function t(key) {
     return window.KGM.i18n.t(key);
   }
+
   function reduceMotion() {
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
+
   function isRtl() {
     return window.KGM.i18n.getDir() === "rtl";
   }
 
   function renderSlide(model, index, duplicate) {
     return `
-      <article class="model-slide" data-model-id="${model.id}" data-index="${index}" ${duplicate ? 'aria-hidden="true"' : ""} role="group" aria-roledescription="slide" aria-label="${model.name}">
-        <img class="model-slide__image" src="${model.image}" alt="${duplicate ? "" : model.name}" loading="${index < 4 ? "eager" : "lazy"}" decoding="async">
+      <article
+        class="model-slide"
+        data-model-id="${model.id}"
+        data-index="${index}"
+        ${duplicate ? 'aria-hidden="true"' : ""}
+        role="group"
+        aria-roledescription="slide"
+        aria-label="${model.name}"
+      >
+        <img
+          class="model-slide__image"
+          src="${model.image}"
+          alt="${duplicate ? "" : model.name}"
+          loading="${index < 4 ? "eager" : "lazy"}"
+          decoding="async"
+        >
+
         <span class="model-slide__shade" aria-hidden="true"></span>
+
         <div class="model-slide__content">
           <h3 class="model-slide__name">${model.name}</h3>
-          <button type="button" class="model-slide__link" data-select-model="${model.id}">
-            ${t("models.cta")} <span aria-hidden="true">↗</span>
+
+          <button
+            type="button"
+            class="model-slide__link"
+            data-select-model="${model.id}"
+          >
+            ${t("models.cta")}
+            <span aria-hidden="true">↗</span>
           </button>
         </div>
-      </article>`;
+      </article>
+    `;
   }
 
   function renderCurrentFilter() {
     visibleModels = allModels.filter((model) => model.type === activeFilter);
+
     if (!trackEl) return;
 
-    const first = visibleModels
+    const firstCopy = visibleModels
       .map((model, index) => renderSlide(model, index, false))
       .join("");
 
-    const second =
-      visibleModels.length > 2
+    const secondCopy =
+      visibleModels.length > 1
         ? visibleModels
             .map((model, index) => renderSlide(model, index, true))
             .join("")
         : "";
 
-    trackEl.innerHTML = first + second;
-    trackEl.scrollLeft = 0;
+    trackEl.innerHTML = firstCopy + secondCopy;
+
+    trackEl.scrollTo({
+      left: 0,
+      behavior: "auto",
+    });
+
+    previousTime = null;
 
     populateModelSelect(allModels);
+    startContinuousAutoplay();
   }
 
   function setFilter(filter) {
@@ -60,6 +98,7 @@ window.KGM = window.KGM || {};
 
     document.querySelectorAll("[data-model-filter]").forEach((button) => {
       const active = button.dataset.modelFilter === filter;
+
       button.classList.toggle("is-active", active);
       button.setAttribute("aria-pressed", String(active));
     });
@@ -69,6 +108,7 @@ window.KGM = window.KGM || {};
 
   function cardStep() {
     const card = trackEl?.querySelector(".model-slide");
+
     if (!card) return 320;
 
     const gap = parseFloat(getComputedStyle(trackEl).gap || "0") || 0;
@@ -76,33 +116,82 @@ window.KGM = window.KGM || {};
     return card.getBoundingClientRect().width + gap;
   }
 
+  function originalTrackWidth() {
+    if (!trackEl || visibleModels.length < 2) return 0;
+
+    return trackEl.scrollWidth / 2;
+  }
+
   function normalizedScroll() {
+    if (!trackEl) return 0;
+
     return Math.abs(trackEl.scrollLeft);
+  }
+
+  function resetLoopIfNeeded() {
+    if (!trackEl || visibleModels.length < 2) return;
+
+    const loopWidth = originalTrackWidth();
+    const current = normalizedScroll();
+
+    if (current >= loopWidth) {
+      const overflow = current - loopWidth;
+      const direction = isRtl() ? -1 : 1;
+
+      trackEl.scrollTo({
+        left: overflow * direction,
+        behavior: "auto",
+      });
+    }
+  }
+
+  function continuousAutoplay(timestamp) {
+    if (!trackEl) return;
+
+    if (previousTime === null) {
+      previousTime = timestamp;
+    }
+
+    const elapsed = timestamp - previousTime;
+    previousTime = timestamp;
+
+    if (!autoplayPaused && !reduceMotion() && visibleModels.length > 1) {
+      const direction = isRtl() ? -1 : 1;
+      const movement = AUTOPLAY_SPEED * (elapsed / 1000);
+
+      trackEl.scrollLeft += movement * direction;
+
+      resetLoopIfNeeded();
+    }
+
+    animationFrame = window.requestAnimationFrame(continuousAutoplay);
+  }
+
+  function startContinuousAutoplay() {
+    if (animationFrame) return;
+
+    previousTime = null;
+    animationFrame = window.requestAnimationFrame(continuousAutoplay);
+  }
+
+  function pauseAutoplay() {
+    autoplayPaused = true;
+  }
+
+  function resumeAutoplay() {
+    autoplayPaused = false;
+    previousTime = null;
   }
 
   function scrollByCards(direction) {
     if (!trackEl) return;
 
-    const sign = isRtl() ? -1 : 1;
+    const directionSign = isRtl() ? -1 : 1;
 
     trackEl.scrollBy({
-      left: cardStep() * direction * sign,
+      left: cardStep() * direction * directionSign,
       behavior: reduceMotion() ? "auto" : "smooth",
     });
-  }
-
-  function resetLoopIfNeeded() {
-    if (!trackEl || visibleModels.length <= 2) return;
-
-    const originalWidth = trackEl.scrollWidth / 2;
-    const current = normalizedScroll();
-
-    if (current >= originalWidth - cardStep()) {
-      trackEl.scrollTo({
-        left: 0,
-        behavior: "auto",
-      });
-    }
   }
 
   function populateModelSelect(data) {
@@ -116,7 +205,9 @@ window.KGM = window.KGM || {};
     const placeholder = select.querySelector('option[value=""]');
 
     const sorted = [...data].sort((a, b) =>
-      a.name.localeCompare(b.name, "en", { sensitivity: "base" }),
+      a.name.localeCompare(b.name, "en", {
+        sensitivity: "base",
+      }),
     );
 
     select.innerHTML = "";
@@ -127,8 +218,10 @@ window.KGM = window.KGM || {};
 
     sorted.forEach((model) => {
       const option = document.createElement("option");
+
       option.value = model.id;
       option.textContent = model.name;
+
       select.appendChild(option);
     });
 
@@ -139,11 +232,17 @@ window.KGM = window.KGM || {};
 
   function bindEvents() {
     document.getElementById("model-prev")?.addEventListener("click", () => {
+      pauseAutoplay();
       scrollByCards(-1);
+
+      window.setTimeout(resumeAutoplay, 900);
     });
 
     document.getElementById("model-next")?.addEventListener("click", () => {
+      pauseAutoplay();
       scrollByCards(1);
+
+      window.setTimeout(resumeAutoplay, 900);
     });
 
     document.querySelectorAll("[data-model-filter]").forEach((button) => {
@@ -157,17 +256,22 @@ window.KGM = window.KGM || {};
       () => {
         window.clearTimeout(scrollTimer);
 
-        scrollTimer = window.setTimeout(resetLoopIfNeeded, 140);
+        scrollTimer = window.setTimeout(resetLoopIfNeeded, 80);
       },
       { passive: true },
     );
 
     trackEl.addEventListener("keydown", (event) => {
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+        return;
+      }
 
       event.preventDefault();
+      pauseAutoplay();
 
       scrollByCards(event.key === "ArrowRight" ? 1 : -1);
+
+      window.setTimeout(resumeAutoplay, 900);
     });
 
     trackEl.addEventListener("click", (event) => {
@@ -195,10 +299,24 @@ window.KGM = window.KGM || {};
           ?.focus({ preventScroll: true });
       }, 550);
     });
+
+    trackEl.addEventListener("pointerenter", pauseAutoplay);
+    trackEl.addEventListener("pointerleave", resumeAutoplay);
+    trackEl.addEventListener("focusin", pauseAutoplay);
+    trackEl.addEventListener("focusout", resumeAutoplay);
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        pauseAutoplay();
+      } else {
+        resumeAutoplay();
+      }
+    });
   }
 
   function renderModels(data) {
     allModels = Array.isArray(data) ? data : [];
+
     trackEl = document.getElementById("model-track");
 
     if (!trackEl) return;
