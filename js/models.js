@@ -1,12 +1,26 @@
-// models.js — renders The Models carousel from data/models.js.
+// models.js — lineup-only smooth carousel update.
 window.KGM = window.KGM || {};
 
 (function () {
   "use strict";
 
-  let modelsData = [];
+  const AUTOPLAY_SPEED = 28;
+  const RESUME_DELAY = 900;
+
+  let allModels = [];
+  let visibleModels = [];
+  let activeFilter = "all";
   let trackEl = null;
-  let dotsEl = null;
+
+  let offset = 0;
+  let animationFrame = null;
+  let previousTime = null;
+  let autoplayPaused = false;
+  let resumeTimer = null;
+
+  let dragging = false;
+  let pointerStartX = 0;
+  let dragStartOffset = 0;
 
   function t(key) {
     return window.KGM.i18n.t(key);
@@ -16,367 +30,370 @@ window.KGM = window.KGM || {};
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
-  function statRow(model) {
-    return model.keyNumbers
-      .map((kn) => {
-        const value = kn && kn.value ? kn.value : "—";
-        const label = kn && kn.label ? kn.label : t("models.contentRequired");
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
 
-        return `
-          <div class="stat">
-            <div class="stat-value">${value}</div>
-            <div class="stat-label">${label}</div>
-          </div>
-        `;
-      })
-      .join("");
+  function getModelType(model) {
+    const category = String(model.category || "").toLowerCase();
+    return category.includes("pickup") ? "pickup" : "suv";
   }
 
   function renderSlide(model, index) {
-    const desc = model.description
-      ? `<p class="model-slide__desc">${model.description}</p>`
-      : `
-        <p class="model-slide__desc content-required-tag">
-          ${t("models.contentRequired")}
-        </p>
-      `;
+    const name = escapeHtml(model.name);
+    const id = escapeHtml(model.id);
+    const image = escapeHtml(model.image);
 
     return `
       <article
         class="model-slide"
-        data-model-id="${model.id}"
+        data-model-id="${id}"
         data-index="${index}"
         role="group"
         aria-roledescription="slide"
-        aria-label="${model.name}"
+        aria-label="${name}"
       >
-        <div class="model-slide__media">
-          <span
-            class="model-slide__ground"
-            aria-hidden="true"
-          ></span>
+        <img
+          class="model-slide__image"
+          src="${image}"
+          alt="${name}"
+          loading="${index < 4 ? "eager" : "lazy"}"
+          decoding="async"
+          draggable="false"
+        />
 
-          <img
-            src="${model.image}"
-            alt="${model.name}"
-            loading="${index === 0 ? "eager" : "lazy"}"
-            width="900"
-            height="600"
-            draggable="false"
+        <span class="model-slide__shade" aria-hidden="true"></span>
+
+        <div class="model-slide__content">
+          <h3 class="model-slide__name">${name}</h3>
+
+          <button
+            type="button"
+            class="model-slide__link"
+            data-select-model="${id}"
           >
-        </div>
-
-        <div class="model-slide__body">
-          <div class="model-slide__eyebrow-row">
-            <span class="model-slide__category">
-              ${model.category || t("models.contentRequired")}
-            </span>
-          </div>
-
-          <h3 class="model-slide__name">
-            ${model.name}
-          </h3>
-
-          ${desc}
-
-          <div class="model-stat-row">
-            ${statRow(model)}
-          </div>
-
-          <div class="model-slide__actions">
-            <button
-              type="button"
-              class="btn btn--primary"
-              data-select-model="${model.id}"
-            >
-              ${t("models.cta")}
-            </button>
-          </div>
+            ${escapeHtml(t("models.cta"))}
+            <span aria-hidden="true">↗</span>
+          </button>
         </div>
       </article>
     `;
   }
 
-  function goToIndex(index, behavior) {
+  function cardWidth(card) {
+    if (!card || !trackEl) return 0;
+
+    const trackStyle = getComputedStyle(trackEl);
+    const gap =
+      parseFloat(trackStyle.columnGap || trackStyle.gap || "0") || 0;
+
+    return card.getBoundingClientRect().width + gap;
+  }
+
+  function applyTransform() {
+    if (!trackEl) return;
+    trackEl.style.transform = `translate3d(${-offset}px, 0, 0)`;
+  }
+
+  function recycleForward() {
+    if (!trackEl || visibleModels.length < 2) return;
+
+    let firstCard = trackEl.firstElementChild;
+    let width = cardWidth(firstCard);
+
+    while (firstCard && width > 0 && offset >= width) {
+      offset -= width;
+      trackEl.appendChild(firstCard);
+
+      firstCard = trackEl.firstElementChild;
+      width = cardWidth(firstCard);
+    }
+  }
+
+  function recycleBackward() {
+    if (!trackEl || visibleModels.length < 2) return;
+
+    while (offset < 0) {
+      const lastCard = trackEl.lastElementChild;
+      if (!lastCard) break;
+
+      trackEl.insertBefore(lastCard, trackEl.firstElementChild);
+      offset += cardWidth(lastCard);
+    }
+  }
+
+  function normalizePosition() {
+    recycleForward();
+    recycleBackward();
+    applyTransform();
+  }
+
+  function autoplayFrame(timestamp) {
     if (!trackEl) return;
 
-    const scrollBehavior = behavior || "smooth";
-    const slides = trackEl.querySelectorAll(".model-slide");
-
-    const clampedIndex = Math.max(0, Math.min(index, slides.length - 1));
-
-    const slide = slides[clampedIndex];
-
-    if (!slide) return;
-
-    trackEl.scrollTo({
-      left: slide.offsetLeft - trackEl.offsetLeft,
-      behavior: scrollBehavior,
-    });
-
-    updateDots(clampedIndex);
-  }
-
-  function updateDots(activeIndex) {
-    if (!dotsEl) return;
-
-    dotsEl.querySelectorAll("button").forEach((button, index) => {
-      button.classList.toggle("is-active", index === activeIndex);
-    });
-  }
-
-  function currentIndex() {
-    if (!trackEl) return 0;
-
-    const slides = [...trackEl.querySelectorAll(".model-slide")];
-
-    let closestIndex = 0;
-    let minimumDistance = Infinity;
-
-    slides.forEach((slide, index) => {
-      const distance = Math.abs(
-        slide.offsetLeft - trackEl.offsetLeft - trackEl.scrollLeft,
-      );
-
-      if (distance < minimumDistance) {
-        minimumDistance = distance;
-        closestIndex = index;
-      }
-    });
-
-    return closestIndex;
-  }
-
-  function handleModelSelection(event) {
-    const button = event.target.closest("[data-select-model]");
-
-    if (!button) return;
-
-    const modelId = button.dataset.selectModel;
-
-    if (!modelId) return;
-
-    /*
-     * Select the clicked model before scrolling.
-     */
-    window.KGM.form?.prefillModel(modelId);
-
-    /*
-     * Track Register Interest CTA click.
-     */
-    window.KGM.analytics?.track("register_cta_click", {
-      cta_location: "model_card",
-      model_name: modelId,
-    });
-
-    /*
-     * Scroll to Register Interest section.
-     */
-    const registerSection = document.getElementById("register");
-
-    if (registerSection) {
-      registerSection.scrollIntoView({
-        behavior: reduceMotion() ? "auto" : "smooth",
-        block: "start",
-      });
+    if (previousTime === null) {
+      previousTime = timestamp;
     }
 
-    /*
-     * Select the model again after scrolling.
-     * This ensures it remains selected if another script
-     * updates or redraws the form during the scroll.
-     */
-    window.setTimeout(
-      () => {
-        window.KGM.form?.prefillModel(modelId);
+    const elapsed = Math.min(timestamp - previousTime, 50);
+    previousTime = timestamp;
 
-        const nameInput = document.querySelector(
-          '#register-form [name="name"]',
-        );
+    if (
+      !autoplayPaused &&
+      !dragging &&
+      !reduceMotion() &&
+      visibleModels.length > 1
+    ) {
+      offset += AUTOPLAY_SPEED * (elapsed / 1000);
+      normalizePosition();
+    }
 
-        if (nameInput) {
-          nameInput.focus({
-            preventScroll: true,
-          });
-        }
-      },
-      reduceMotion() ? 50 : 650,
-    );
+    animationFrame = requestAnimationFrame(autoplayFrame);
+  }
+
+  function startAutoplay() {
+    if (animationFrame !== null) return;
+    previousTime = null;
+    animationFrame = requestAnimationFrame(autoplayFrame);
+  }
+
+  function pauseAutoplay() {
+    autoplayPaused = true;
+    previousTime = null;
+    window.clearTimeout(resumeTimer);
+  }
+
+  function resumeAutoplay(delay = 0) {
+    window.clearTimeout(resumeTimer);
+    resumeTimer = window.setTimeout(() => {
+      autoplayPaused = false;
+      previousTime = null;
+    }, delay);
+  }
+
+  function moveByCard(direction) {
+    if (!trackEl || visibleModels.length < 2) return;
+
+    pauseAutoplay();
+
+    const firstCard = trackEl.firstElementChild;
+    const distance = cardWidth(firstCard);
+    const start = offset;
+    const target = start + distance * direction;
+    const duration = reduceMotion() ? 0 : 420;
+    const startedAt = performance.now();
+
+    function step(now) {
+      const progress =
+        duration === 0 ? 1 : Math.min((now - startedAt) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+
+      offset = start + (target - start) * eased;
+      normalizePosition();
+
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        resumeAutoplay(RESUME_DELAY);
+      }
+    }
+
+    requestAnimationFrame(step);
   }
 
   function populateModelSelect(data) {
-    const models = data || modelsData;
-
     const select = document.querySelector(
       '#register-form select[name="model"]',
     );
 
     if (!select) return;
 
-    const existingValue = select.value;
-
+    const currentValue = select.value;
     const placeholderText =
       select.querySelector('option[value=""]')?.textContent ||
-      t("register.fields.modelPlaceholder") ||
-      "Select a model";
+      t("register.fields.modelPlaceholder");
 
     select.innerHTML = "";
 
     const placeholder = document.createElement("option");
-
     placeholder.value = "";
     placeholder.textContent = placeholderText;
-
     select.appendChild(placeholder);
 
-    models.forEach((model) => {
-      const option = document.createElement("option");
+    [...data]
+      .sort((a, b) =>
+        a.name.localeCompare(b.name, "en", { sensitivity: "base" }),
+      )
+      .forEach((model) => {
+        const option = document.createElement("option");
+        option.value = model.id;
+        option.textContent = model.name;
+        select.appendChild(option);
+      });
 
-      option.value = model.id;
-      option.textContent = model.name;
-
-      select.appendChild(option);
-    });
-
-    const existingOption = [...select.options].some((option) => {
-      return option.value === existingValue;
-    });
-
-    if (existingOption) {
-      select.value = existingValue;
+    if ([...select.options].some((option) => option.value === currentValue)) {
+      select.value = currentValue;
     }
   }
 
-  function renderModels(data) {
-    modelsData = Array.isArray(data) ? data : [];
-
-    trackEl = document.getElementById("model-track");
-
-    dotsEl = document.getElementById("carousel-dots");
+  function renderCurrentFilter() {
+    visibleModels =
+      activeFilter === "all"
+        ? [...allModels]
+        : allModels.filter((model) => getModelType(model) === activeFilter);
 
     if (!trackEl) return;
 
-    trackEl.innerHTML = modelsData.map(renderSlide).join("");
+    offset = 0;
+    trackEl.innerHTML = visibleModels
+      .map((model, index) => renderSlide(model, index))
+      .join("");
 
-    populateModelSelect(modelsData);
+    applyTransform();
+    previousTime = null;
+    populateModelSelect(allModels);
+    startAutoplay();
+  }
 
-    if (dotsEl) {
-      dotsEl.innerHTML = modelsData
-        .map(
-          (_, index) => `
-            <button
-              type="button"
-              aria-label="${index + 1}"
-              data-dot="${index}"
-            ></button>
-          `,
-        )
-        .join("");
+  function setFilter(filter) {
+    if (!["all", "suv", "pickup"].includes(filter)) return;
 
-      dotsEl.querySelectorAll("button").forEach((button) => {
-        button.addEventListener("click", () => {
-          goToIndex(Number(button.dataset.dot));
-        });
+    activeFilter = filter;
+
+    document.querySelectorAll("[data-model-filter]").forEach((button) => {
+      const isActive = button.dataset.modelFilter === filter;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+
+    renderCurrentFilter();
+  }
+
+  function handleModelSelection(event) {
+    const button = event.target.closest("[data-select-model]");
+    if (!button) return;
+
+    const id = button.dataset.selectModel;
+
+    window.KGM.form?.prefillModel(id);
+    window.KGM.analytics?.track("register_cta_click", {
+      cta_location: "model_card",
+      model_name: id,
+    });
+
+    document.getElementById("register")?.scrollIntoView({
+      behavior: reduceMotion() ? "auto" : "smooth",
+      block: "start",
+    });
+
+    window.setTimeout(() => {
+      document
+        .querySelector('#register-form [name="name"]')
+        ?.focus({ preventScroll: true });
+    }, 550);
+  }
+
+  function beginDrag(event) {
+    if (event.button !== undefined && event.button !== 0) return;
+
+    dragging = true;
+    pointerStartX = event.clientX;
+    dragStartOffset = offset;
+    pauseAutoplay();
+
+    trackEl.classList.add("is-dragging");
+    trackEl.setPointerCapture?.(event.pointerId);
+  }
+
+  function updateDrag(event) {
+    if (!dragging) return;
+
+    offset = dragStartOffset - (event.clientX - pointerStartX);
+    normalizePosition();
+  }
+
+  function endDrag(event) {
+    if (!dragging) return;
+
+    dragging = false;
+    trackEl.classList.remove("is-dragging");
+    trackEl.releasePointerCapture?.(event.pointerId);
+    resumeAutoplay(RESUME_DELAY);
+  }
+
+  function bindEvents() {
+    document.getElementById("model-prev")?.addEventListener("click", () => {
+      moveByCard(-1);
+    });
+
+    document.getElementById("model-next")?.addEventListener("click", () => {
+      moveByCard(1);
+    });
+
+    document.querySelectorAll("[data-model-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        setFilter(button.dataset.modelFilter);
       });
-
-      updateDots(0);
-    }
-
-    const previousButton = document.getElementById("model-prev");
-
-    const nextButton = document.getElementById("model-next");
-
-    function directionSign() {
-      return window.KGM.i18n.getDir() === "rtl" ? -1 : 1;
-    }
-
-    if (previousButton) {
-      previousButton.addEventListener("click", () => {
-        const newIndex = currentIndex() - directionSign();
-
-        goToIndex(newIndex);
-
-        const selectedModel =
-          modelsData[Math.max(0, Math.min(newIndex, modelsData.length - 1))];
-
-        window.KGM.analytics?.track("model_view", {
-          model_name: selectedModel?.name || "",
-          method: "arrow",
-        });
-      });
-    }
-
-    if (nextButton) {
-      nextButton.addEventListener("click", () => {
-        const newIndex = currentIndex() + directionSign();
-
-        goToIndex(newIndex);
-
-        const selectedModel =
-          modelsData[Math.max(0, Math.min(newIndex, modelsData.length - 1))];
-
-        window.KGM.analytics?.track("model_view", {
-          model_name: selectedModel?.name || "",
-          method: "arrow",
-        });
-      });
-    }
-
-    let scrollTimeout;
-
-    trackEl.addEventListener(
-      "scroll",
-      () => {
-        window.clearTimeout(scrollTimeout);
-
-        scrollTimeout = window.setTimeout(() => {
-          const index = currentIndex();
-
-          updateDots(index);
-
-          window.KGM.analytics?.track("model_view", {
-            model_name: modelsData[index]?.name || "",
-            method: "swipe",
-          });
-        }, 160);
-      },
-      {
-        passive: true,
-      },
-    );
-
-    trackEl.addEventListener("keydown", (event) => {
-      const isRTL = window.KGM.i18n.getDir() === "rtl";
-
-      if (event.key === "ArrowRight") {
-        event.preventDefault();
-
-        goToIndex(currentIndex() + (isRTL ? -1 : 1));
-      }
-
-      if (event.key === "ArrowLeft") {
-        event.preventDefault();
-
-        goToIndex(currentIndex() + (isRTL ? 1 : -1));
-      }
     });
 
     trackEl.addEventListener("click", handleModelSelection);
+
+    trackEl.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        moveByCard(-1);
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        moveByCard(1);
+      }
+    });
+
+    trackEl.addEventListener("pointerdown", beginDrag);
+    trackEl.addEventListener("pointermove", updateDrag);
+    trackEl.addEventListener("pointerup", endDrag);
+    trackEl.addEventListener("pointercancel", endDrag);
+
+    trackEl.addEventListener("pointerenter", pauseAutoplay);
+    trackEl.addEventListener("pointerleave", () => {
+      if (!dragging) resumeAutoplay();
+    });
+
+    trackEl.addEventListener("focusin", pauseAutoplay);
+    trackEl.addEventListener("focusout", () => resumeAutoplay());
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        pauseAutoplay();
+      } else {
+        resumeAutoplay();
+      }
+    });
+  }
+
+  function renderModels(data) {
+    allModels = Array.isArray(data) ? data : [];
+    trackEl = document.getElementById("model-track");
+
+    if (!trackEl) return;
+
+    bindEvents();
+    renderCurrentFilter();
   }
 
   function reflowOnLanguageChange() {
-    if (!trackEl || !modelsData.length) return;
-
-    trackEl.innerHTML = modelsData.map(renderSlide).join("");
-
-    populateModelSelect(modelsData);
-
-    goToIndex(0, "auto");
+    if (!trackEl) return;
+    renderCurrentFilter();
   }
 
   window.KGM.models = {
     renderModels,
     populateModelSelect,
     reflowOnLanguageChange,
+    setFilter,
   };
 })();
