@@ -1,22 +1,26 @@
-// models.js — seamless, continuous KGM lineup carousel.
+// models.js — lineup-only smooth carousel update.
 window.KGM = window.KGM || {};
 
 (function () {
   "use strict";
 
-  const AUTOPLAY_SPEED = 26;
+  const AUTOPLAY_SPEED = 28;
   const RESUME_DELAY = 900;
 
   let allModels = [];
   let visibleModels = [];
-  let activeFilter = "suv";
+  let activeFilter = "all";
   let trackEl = null;
+
+  let offset = 0;
   let animationFrame = null;
   let previousTime = null;
-  let loopWidth = 0;
   let autoplayPaused = false;
   let resumeTimer = null;
-  let resizeTimer = null;
+
+  let dragging = false;
+  let pointerStartX = 0;
+  let dragStartOffset = 0;
 
   function t(key) {
     return window.KGM.i18n.t(key);
@@ -35,7 +39,12 @@ window.KGM = window.KGM || {};
       .replaceAll("'", "&#039;");
   }
 
-  function renderSlide(model, index, duplicate) {
+  function getModelType(model) {
+    const category = String(model.category || "").toLowerCase();
+    return category.includes("pickup") ? "pickup" : "suv";
+  }
+
+  function renderSlide(model, index) {
     const name = escapeHtml(model.name);
     const id = escapeHtml(model.id);
     const image = escapeHtml(model.image);
@@ -45,7 +54,6 @@ window.KGM = window.KGM || {};
         class="model-slide"
         data-model-id="${id}"
         data-index="${index}"
-        ${duplicate ? 'aria-hidden="true"' : ""}
         role="group"
         aria-roledescription="slide"
         aria-label="${name}"
@@ -53,7 +61,7 @@ window.KGM = window.KGM || {};
         <img
           class="model-slide__image"
           src="${image}"
-          alt="${duplicate ? "" : name}"
+          alt="${name}"
           loading="${index < 4 ? "eager" : "lazy"}"
           decoding="async"
           draggable="false"
@@ -77,79 +85,52 @@ window.KGM = window.KGM || {};
     `;
   }
 
-  function measureLoop() {
-    if (!trackEl || visibleModels.length < 2) {
-      loopWidth = 0;
-      return;
-    }
+  function cardWidth(card) {
+    if (!card || !trackEl) return 0;
 
-    loopWidth = trackEl.scrollWidth / 2;
+    const trackStyle = getComputedStyle(trackEl);
+    const gap =
+      parseFloat(trackStyle.columnGap || trackStyle.gap || "0") || 0;
+
+    return card.getBoundingClientRect().width + gap;
+  }
+
+  function applyTransform() {
+    if (!trackEl) return;
+    trackEl.style.transform = `translate3d(${-offset}px, 0, 0)`;
+  }
+
+  function recycleForward() {
+    if (!trackEl || visibleModels.length < 2) return;
+
+    let firstCard = trackEl.firstElementChild;
+    let width = cardWidth(firstCard);
+
+    while (firstCard && width > 0 && offset >= width) {
+      offset -= width;
+      trackEl.appendChild(firstCard);
+
+      firstCard = trackEl.firstElementChild;
+      width = cardWidth(firstCard);
+    }
+  }
+
+  function recycleBackward() {
+    if (!trackEl || visibleModels.length < 2) return;
+
+    while (offset < 0) {
+      const lastCard = trackEl.lastElementChild;
+      if (!lastCard) break;
+
+      trackEl.insertBefore(lastCard, trackEl.firstElementChild);
+      offset += cardWidth(lastCard);
+    }
   }
 
   function normalizePosition() {
-    if (!trackEl || loopWidth <= 0) return;
-
-    while (trackEl.scrollLeft >= loopWidth) {
-      trackEl.scrollLeft -= loopWidth;
-    }
-
-    while (trackEl.scrollLeft < 0) {
-      trackEl.scrollLeft += loopWidth;
-    }
-  }
-
-  function renderCurrentFilter() {
-    visibleModels = allModels.filter((model) => model.type === activeFilter);
-
-    if (!trackEl) return;
-
-    stopAutoplay();
-
-    const originalSlides = visibleModels
-      .map((model, index) => renderSlide(model, index, false))
-      .join("");
-
-    const duplicateSlides =
-      visibleModels.length > 1
-        ? visibleModels
-            .map((model, index) => renderSlide(model, index, true))
-            .join("")
-        : "";
-
-    trackEl.innerHTML = originalSlides + duplicateSlides;
-    trackEl.scrollLeft = 0;
-
-    requestAnimationFrame(() => {
-      measureLoop();
-      previousTime = null;
-      startAutoplay();
-    });
-
-    populateModelSelect(allModels);
-  }
-
-  function setFilter(filter) {
-    if (filter !== "suv" && filter !== "pickup") return;
-
-    activeFilter = filter;
-
-    document.querySelectorAll("[data-model-filter]").forEach((button) => {
-      const isActive = button.dataset.modelFilter === filter;
-      button.classList.toggle("is-active", isActive);
-      button.setAttribute("aria-pressed", String(isActive));
-    });
-
-    renderCurrentFilter();
-  }
-
-  function cardStep() {
-    const card = trackEl?.querySelector(".model-slide");
-    if (!card) return 320;
-
-    const style = getComputedStyle(trackEl);
-    const gap = parseFloat(style.columnGap || style.gap || "0") || 0;
-
-    return card.getBoundingClientRect().width + gap;
+    recycleForward();
+    recycleBackward();
+    applyTransform();
   }
 
   function autoplayFrame(timestamp) {
@@ -164,11 +145,11 @@ window.KGM = window.KGM || {};
 
     if (
       !autoplayPaused &&
+      !dragging &&
       !reduceMotion() &&
-      visibleModels.length > 1 &&
-      loopWidth > 0
+      visibleModels.length > 1
     ) {
-      trackEl.scrollLeft += AUTOPLAY_SPEED * (elapsed / 1000);
+      offset += AUTOPLAY_SPEED * (elapsed / 1000);
       normalizePosition();
     }
 
@@ -177,18 +158,8 @@ window.KGM = window.KGM || {};
 
   function startAutoplay() {
     if (animationFrame !== null) return;
-
     previousTime = null;
     animationFrame = requestAnimationFrame(autoplayFrame);
-  }
-
-  function stopAutoplay() {
-    if (animationFrame !== null) {
-      cancelAnimationFrame(animationFrame);
-      animationFrame = null;
-    }
-
-    previousTime = null;
   }
 
   function pauseAutoplay() {
@@ -199,24 +170,40 @@ window.KGM = window.KGM || {};
 
   function resumeAutoplay(delay = 0) {
     window.clearTimeout(resumeTimer);
-
     resumeTimer = window.setTimeout(() => {
       autoplayPaused = false;
       previousTime = null;
     }, delay);
   }
 
-  function scrollByCards(direction) {
-    if (!trackEl || visibleModels.length === 0) return;
+  function moveByCard(direction) {
+    if (!trackEl || visibleModels.length < 2) return;
 
-    if (direction < 0 && trackEl.scrollLeft <= 1 && loopWidth > 0) {
-      trackEl.scrollLeft += loopWidth;
+    pauseAutoplay();
+
+    const firstCard = trackEl.firstElementChild;
+    const distance = cardWidth(firstCard);
+    const start = offset;
+    const target = start + distance * direction;
+    const duration = reduceMotion() ? 0 : 420;
+    const startedAt = performance.now();
+
+    function step(now) {
+      const progress =
+        duration === 0 ? 1 : Math.min((now - startedAt) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+
+      offset = start + (target - start) * eased;
+      normalizePosition();
+
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        resumeAutoplay(RESUME_DELAY);
+      }
     }
 
-    trackEl.scrollBy({
-      left: cardStep() * direction,
-      behavior: reduceMotion() ? "auto" : "smooth",
-    });
+    requestAnimationFrame(step);
   }
 
   function populateModelSelect(data) {
@@ -254,6 +241,39 @@ window.KGM = window.KGM || {};
     }
   }
 
+  function renderCurrentFilter() {
+    visibleModels =
+      activeFilter === "all"
+        ? [...allModels]
+        : allModels.filter((model) => getModelType(model) === activeFilter);
+
+    if (!trackEl) return;
+
+    offset = 0;
+    trackEl.innerHTML = visibleModels
+      .map((model, index) => renderSlide(model, index))
+      .join("");
+
+    applyTransform();
+    previousTime = null;
+    populateModelSelect(allModels);
+    startAutoplay();
+  }
+
+  function setFilter(filter) {
+    if (!["all", "suv", "pickup"].includes(filter)) return;
+
+    activeFilter = filter;
+
+    document.querySelectorAll("[data-model-filter]").forEach((button) => {
+      const isActive = button.dataset.modelFilter === filter;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+
+    renderCurrentFilter();
+  }
+
   function handleModelSelection(event) {
     const button = event.target.closest("[data-select-model]");
     if (!button) return;
@@ -278,17 +298,41 @@ window.KGM = window.KGM || {};
     }, 550);
   }
 
+  function beginDrag(event) {
+    if (event.button !== undefined && event.button !== 0) return;
+
+    dragging = true;
+    pointerStartX = event.clientX;
+    dragStartOffset = offset;
+    pauseAutoplay();
+
+    trackEl.classList.add("is-dragging");
+    trackEl.setPointerCapture?.(event.pointerId);
+  }
+
+  function updateDrag(event) {
+    if (!dragging) return;
+
+    offset = dragStartOffset - (event.clientX - pointerStartX);
+    normalizePosition();
+  }
+
+  function endDrag(event) {
+    if (!dragging) return;
+
+    dragging = false;
+    trackEl.classList.remove("is-dragging");
+    trackEl.releasePointerCapture?.(event.pointerId);
+    resumeAutoplay(RESUME_DELAY);
+  }
+
   function bindEvents() {
     document.getElementById("model-prev")?.addEventListener("click", () => {
-      pauseAutoplay();
-      scrollByCards(-1);
-      resumeAutoplay(RESUME_DELAY);
+      moveByCard(-1);
     });
 
     document.getElementById("model-next")?.addEventListener("click", () => {
-      pauseAutoplay();
-      scrollByCards(1);
-      resumeAutoplay(RESUME_DELAY);
+      moveByCard(1);
     });
 
     document.querySelectorAll("[data-model-filter]").forEach((button) => {
@@ -297,39 +341,30 @@ window.KGM = window.KGM || {};
       });
     });
 
-    trackEl.addEventListener("scroll", normalizePosition, { passive: true });
-
-    trackEl.addEventListener("keydown", (event) => {
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-
-      event.preventDefault();
-      pauseAutoplay();
-      scrollByCards(event.key === "ArrowRight" ? 1 : -1);
-      resumeAutoplay(RESUME_DELAY);
-    });
-
     trackEl.addEventListener("click", handleModelSelection);
 
+    trackEl.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        moveByCard(-1);
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        moveByCard(1);
+      }
+    });
+
+    trackEl.addEventListener("pointerdown", beginDrag);
+    trackEl.addEventListener("pointermove", updateDrag);
+    trackEl.addEventListener("pointerup", endDrag);
+    trackEl.addEventListener("pointercancel", endDrag);
+
     trackEl.addEventListener("pointerenter", pauseAutoplay);
-    trackEl.addEventListener("pointerleave", () => resumeAutoplay());
-    trackEl.addEventListener("pointerdown", pauseAutoplay);
-    trackEl.addEventListener("pointerup", () => resumeAutoplay(RESUME_DELAY));
-    trackEl.addEventListener("touchstart", pauseAutoplay, { passive: true });
-    trackEl.addEventListener(
-      "touchend",
-      () => resumeAutoplay(RESUME_DELAY),
-      { passive: true },
-    );
+    trackEl.addEventListener("pointerleave", () => {
+      if (!dragging) resumeAutoplay();
+    });
+
     trackEl.addEventListener("focusin", pauseAutoplay);
     trackEl.addEventListener("focusout", () => resumeAutoplay());
-
-    window.addEventListener("resize", () => {
-      window.clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(() => {
-        measureLoop();
-        normalizePosition();
-      }, 150);
-    });
 
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {

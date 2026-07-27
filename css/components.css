@@ -407,7 +407,7 @@ html[lang="ar"] .campaign-card h3 {
 }
 
 /* ---------------------------------------------------------------
-   Models carousel — full-bleed, continuous and seamless
+   Models carousel — lineup-only update
    --------------------------------------------------------------- */
 .models {
   overflow: hidden;
@@ -415,10 +415,19 @@ html[lang="ar"] .campaign-card h3 {
 
 .lineup-heading {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-md);
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: var(--space-sm);
   margin-bottom: var(--space-lg);
+}
+
+.lineup-heading > div:first-child {
+  display: block;
+}
+
+.lineup-heading .eyebrow {
+  margin: 0;
 }
 
 .lineup-heading .h2:empty,
@@ -429,8 +438,9 @@ html[lang="ar"] .campaign-card h3 {
 .model-filters {
   display: inline-flex;
   align-items: center;
+  justify-content: flex-start;
   gap: var(--space-2xs);
-  flex-shrink: 0;
+  margin: 0;
 }
 
 .model-filter {
@@ -471,34 +481,26 @@ html[lang="ar"] .model-filter {
   display: flex;
   align-items: stretch;
   gap: 0;
-  width: 100%;
+  width: max-content;
   max-width: none;
   margin: 0;
   padding: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: visible;
   direction: ltr;
-  scroll-behavior: auto;
-  scroll-snap-type: none;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-x;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  touch-action: pan-y;
   cursor: grab;
+  user-select: none;
 }
 
-.model-track:active {
+.model-track.is-dragging {
   cursor: grabbing;
 }
 
 .model-track:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: -2px;
-}
-
-.model-track::-webkit-scrollbar {
-  display: none;
 }
 
 .model-slide {
@@ -520,14 +522,14 @@ html[lang="ar"] .model-filter {
   display: block;
   object-fit: cover;
   object-position: center;
-  user-select: none;
   pointer-events: none;
+  user-select: none;
   transform: scale(1.001);
-  transition: transform var(--dur-slow) var(--ease-cinematic);
+  transition: transform 700ms var(--ease-cinematic);
 }
 
 .model-slide:hover .model-slide__image {
-  transform: scale(1.045);
+  transform: scale(1.04);
 }
 
 .model-slide__shade {
@@ -535,7 +537,12 @@ html[lang="ar"] .model-filter {
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(to top, rgba(5, 6, 8, 0.92) 0%, rgba(5, 6, 8, 0.22) 58%, rgba(5, 6, 8, 0.08) 100%);
+    linear-gradient(
+      to top,
+      rgba(5, 6, 8, 0.92) 0%,
+      rgba(5, 6, 8, 0.24) 58%,
+      rgba(5, 6, 8, 0.06) 100%
+    );
   pointer-events: none;
 }
 
@@ -605,7 +612,7 @@ html[lang="ar"] .model-slide__link {
 
 .carousel-controls {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   margin-top: var(--space-lg);
 }
 
@@ -640,11 +647,6 @@ html[dir="rtl"] .carousel-arrow svg {
 }
 
 @media (max-width: 639px) {
-  .lineup-heading {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
   .model-slide {
     flex-basis: min(82vw, 340px);
     min-height: 440px;

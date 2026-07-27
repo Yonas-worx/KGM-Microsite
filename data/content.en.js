@@ -36,6 +36,7 @@ window.KGM_CONTENT_EN = {
     prev: "Previous model",
     next: "Next model",
     filters: {
+      all: "All",
       suv: "SUV",
       pickup: "Pickup",
     },
